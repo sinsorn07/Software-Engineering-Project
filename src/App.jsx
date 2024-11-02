@@ -1,5 +1,7 @@
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
+import CreatePost from "./pages/createPost/CreatePost";
+import CreateEvent from "./pages/createEvent/CreateEvent";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -7,64 +9,78 @@ import {
   Outlet,
   Navigate,
 } from "react-router-dom";
-import Home from "./pages/home/Home"
-import Profile from "./pages/profile/Profile"
+import Home from "./pages/home/Home";
+import Profile from "./pages/profile/Profile";
 import LeftBar from "./components/leftBar/LeftBar";
 import Navbar from "./components/navbar/Navbar";
-import RightBar from "./components/rightBar/RightBar";
-
 
 function App() {
-
   const currentUser = true;
 
-  const Layout = ()=>{
-    return(
-      <div>
-        <Navbar />
-        <div style={{display: "flex" }}>
-          <LeftBar />
-          <Outlet />
-          <RightBar />
+  const Layout = () => {
+    return (
+      <div className="flex h-screen overflow-hidden">
+        {/* Navbar fixed at the top */}
+        <div className="fixed w-full z-10">
+          <Navbar />
+        </div>
+        
+        <div className="flex pt-16 w-full">
+          {/* LeftBar fixed to the left side */}
+          <div className="fixed left-0 top-16 h-full w-60">
+            <LeftBar />
+          </div>
+
+          {/* Main Content area, scrollable */}
+          <div className="ml-60 w-full overflow-y-auto h-full">
+            <Outlet />
+          </div>
         </div>
       </div>
     );
   };
 
-  const ProtectedRoute = ({children}) =>{
-    if(!currentUser){
-      return <Navigate to="/login"/>
+  const ProtectedRoute = ({ children }) => {
+    if (!currentUser) {
+      return <Navigate to="/login" />;
     }
-
     return children;
-  }
+  };
 
   const router = createBrowserRouter([
     {
       path: "/",
       element: (
         <ProtectedRoute>
-          <Layout/>
+          <Layout />
         </ProtectedRoute>
       ),
       children: [
         {
           path: "/",
-          element: <Home/>,
+          element: <Home />,
         },
         {
           path: "/profile/:id",
-          element: <Profile/>
-        }
-      ]
+          element: <Profile />,
+        },
+        {
+          path: "/create-event",
+          element: <CreateEvent />,
+        },
+        {
+          path: "/create-post",
+          element: <CreatePost />,
+        },
+      ],
     },
     {
       path: "/login",
-      element: <Login/>,
+      element: <Login />,
     },
     {
       path: "/register",
-      element: <Register/>,
+      element: <Register />,
     },
   ]);
 
