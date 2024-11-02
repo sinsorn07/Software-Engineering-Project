@@ -8,9 +8,8 @@ const Register = () => {
                 <div className="left">
                     <h1>Meetro Social</h1>
                     <p>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero cum,
-                        alias totam numquam ipsa exercitationem dignissimos, error nam,
-                        consequatur.
+                        Get started by creating an account and explore a world where every gathering is memorable. 
+                        Share photos, join conversations, and keep the good times going.
                     </p>
                     <span>Do you have an account?</span>
                     <Link to="/login">
