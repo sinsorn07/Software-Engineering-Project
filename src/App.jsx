@@ -2,6 +2,7 @@ import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import CreatePost from "./pages/createPost/CreatePost";
 import CreateEvent from "./pages/createEvent/CreateEvent";
+import EventDetail from "./pages/eventDetail/eventDetail";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -72,6 +73,10 @@ function App() {
           path: "/create-post",
           element: <CreatePost />,
         },
+        {
+          path: "/event/:id",
+          element: <EventDetail />,
+        },               
       ],
     },
     {
