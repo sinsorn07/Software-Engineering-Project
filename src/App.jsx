@@ -2,6 +2,7 @@ import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import CreatePost from "./pages/createPost/CreatePost";
 import CreateEvent from "./pages/createEvent/CreateEvent";
+import Profile from "./pages/profile/Profile";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -10,7 +11,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import Home from "./pages/home/Home";
-import Profile from "./pages/profile/Profile";
+/*import Profile from "./pages/profile/Profile";*/
 import LeftBar from "./components/leftBar/LeftBar";
 import Navbar from "./components/navbar/Navbar";
 
@@ -61,7 +62,7 @@ function App() {
           element: <Home />,
         },
         {
-          path: "/profile/:id",
+          path: "/profile",
           element: <Profile />,
         },
         {
