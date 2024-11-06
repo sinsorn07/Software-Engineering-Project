@@ -2,6 +2,7 @@ import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import CreatePost from "./pages/createPost/CreatePost";
 import CreateEvent from "./pages/createEvent/CreateEvent";
+import EditEvent from "./pages/editEvent/EditEvent";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -67,6 +68,10 @@ function App() {
         {
           path: "/create-event",
           element: <CreateEvent />,
+        },
+        {
+          path: "/edit-event",
+          element: <EditEvent />,
         },
         {
           path: "/create-post",
