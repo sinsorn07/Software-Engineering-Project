@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { FaArrowLeft,FaEllipsisV } from 'react-icons/fa';
+import { FaArrowLeft, FaEllipsisV } from 'react-icons/fa';
 import useScrollDirection from '../../hooks/useScrollDirection';
 import MapComponent from '../../components/map/MapComponent';
 import BackButton from '../../components/backbutton/BackButton';
@@ -14,7 +14,7 @@ const EventDetail = () => {
     const eventData = { // each event detail, including participants
         1: {
             eventName: "Sung Hyeonje Birthday Party🎂",
-            description: "Greeting Hunters, you are all invited to join the Sesung Guild Leader's birthday party!",
+            description: "Greeting Hunters, you are all invited to the Seseong guild leader's birthday party!",
             locationName: "Seseong Guild building, Seoul, South Korea",
             latitude: 37.5665, // Example latitude for Seoul
             longitude: 126.9780, // Example longitude for Seoul
@@ -30,6 +30,25 @@ const EventDetail = () => {
                 { id: 2, username: 'Honeypot2512', profilePic: 'https://pbs.twimg.com/profile_images/1535154420043788289/VpKXcleb_400x400.jpg' },
                 { id: 3, username: 'SnowBunnyBYR', profilePic: 'https://64.media.tumblr.com/d211ccfb8f77569e08d21b8a31b16c80/8d6ab8101b440cec-9d/s250x250_c1/ffb41bca040a68772c4ac69ee2295a376b4b2d48.jpg' },
                 { id: 4, username: 'GoldForge', profilePic: 'https://i.pinimg.com/736x/a0/eb/3b/a0eb3b7bd43f1760c7faa41da47eb2af.jpg' },
+                { id: 5, username: 'Ichigo', profilePic: 'https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg' }
+            ],
+            posts: [
+                {
+                    user: {
+                        name: 'Ichigo',
+                        username: 'ichigo',
+                        profilePic: 'https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg',
+                    },
+                    time: '10:00 AM',
+                    eventName: 'Sung Hyeonje Birthday Party🎂',
+                    content: 'What a wonderful event! Can\'t wait to see everyone there.',
+                    image: 'https://i.pinimg.com/474x/22/fd/8c/22fd8c474753173569f5ec106978718a.jpg',
+                    likes: 45,
+                    comments: [
+                        { username: 'BlackFlame', profilePic: 'https://static1.personality-database.com/profile_images/8b28017ec040491cb89ecf24b031e536.png', text: 'Looking forward to it!' },
+                        { username: 'Honeypot2512', profilePic: 'https://pbs.twimg.com/profile_images/1535154420043788289/VpKXcleb_400x400.jpg', text: 'Excited!' },
+                    ],
+                },
             ],
         },
         // Additional events can be added here if needed
@@ -37,27 +56,7 @@ const EventDetail = () => {
 
     const event = eventData[id] || {};
     const participants = event.participants || [];
-
-    // Sample data for posts related to the event
-        const eventPosts = [
-            {
-                user: {
-                    name: 'Ichigo',
-                    username: 'ichigo',
-                    profilePic: 'https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg',
-                },
-                time: '10:00 AM', // Separate the time
-                eventName: 'Sung Hyeonje Birthday Party🎂', // Add event name as a separate field
-                content: 'What a wonderful event! Can\'t wait to see everyone there.',
-                image: 'https://i.pinimg.com/474x/22/fd/8c/22fd8c474753173569f5ec106978718a.jpg',
-                likes: 45,
-                comments: [
-                    { username: 'BlackFlame', profilePic: 'https://static1.personality-database.com/profile_images/8b28017ec040491cb89ecf24b031e536.png', text: 'Looking forward to it!' },
-                    { username: 'Honeypot2512', profilePic: 'https://pbs.twimg.com/profile_images/1535154420043788289/VpKXcleb_400x400.jpg', text: 'Excited!' },
-                ],
-            },
-            // Add more posts as needed
-        ];
+    const eventPosts = event.posts || [];
 
     const handleProfileLink = (username) => {
         console.log(`Navigate to profile of ${username}`);
@@ -100,14 +99,14 @@ const EventDetail = () => {
 
                     {/* Event Creator */}
                     {event.eventCreator && (
-                        <div className="flex items-center text-gray-600 mb-4">
+                        <div className="flex items-center text-black-600 mb-4">
                             <strong className="mr-2">Event Creator:</strong>
                             <img 
                                 src="https://payhip.com/cdn-cgi/image/format=auto/https://pe56d.s3.amazonaws.com/o_1i5b6afha13qt1ti2hht1dsi1ql515.png" 
                                 alt="Profile" 
                                 className="w-8 h-8 rounded-full object-cover mr-2"
                             />
-                            <span>{event.eventCreator}</span>
+                            <span className="cursor-pointer font-semibold text-gray-700 text-base hover:underline">{event.eventCreator}</span>
                         </div>
                     )}
                 </div>
@@ -166,7 +165,12 @@ const EventDetail = () => {
                                                     alt={`${participant.username}'s profile`}
                                                     className="w-12 h-12 rounded-full object-cover"
                                                 />
-                                                <span className="text-gray-600">{participant.username}</span>
+                                                <span
+                                                    className="cursor-pointer font-semibold text-base text-gray-700 hover:underline"
+                                                    onClick={() => handleProfileLink(participant.username)}
+                                                >
+                                                    {participant.username}
+                                                </span>
                                             </div>
                                         ))}
                                     </div>
@@ -179,23 +183,28 @@ const EventDetail = () => {
 
                     {activeTab === 'Posts' && (
                         <>
-                            {/* Display Event Posts Using Post Component */}
-                            {eventPosts.map((post, index) => (
-                                <Post
-                                    key={index}
-                                    user={post.user}
-                                    time={post.time}
-                                    eventName={post.eventName} // Pass the event name
-                                    content={post.content}
-                                    image={post.image}
-                                    likes={post.likes}
-                                    comments={post.comments}
-                                    onProfileClick={handleProfileLink}
-                                />
-                            ))}
+                            {/* Check for posts in the selected event */}
+                            {eventPosts.length > 0 ? (
+                                eventPosts.map((post, index) => (
+                                    <Post
+                                        key={index}
+                                        user={post.user}
+                                        time={post.time}
+                                        eventName={post.eventName}
+                                        content={post.content}
+                                        image={post.image}
+                                        likes={post.likes}
+                                        comments={post.comments}
+                                        onProfileClick={handleProfileLink}
+                                    />
+                                ))
+                            ) : (
+                                <div className="bg-white border rounded-lg p-6 max-w-3xl mx-auto text-center mt-6 shadow-md">
+                                    <p className="text-gray-500">This event has no posts yet.</p>
+                                </div>
+                            )}
                         </>
                     )}
-
                 </div>
             </div>
         </div>

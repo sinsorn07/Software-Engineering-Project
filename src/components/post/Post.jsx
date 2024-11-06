@@ -19,7 +19,7 @@ const Post = ({
             <div className="flex items-center text-base text-gray-700 mb-4">
                 <img src={user.profilePic} alt="User" className="mr-2 w-10 h-10 rounded-full object-cover" />
                 <span 
-                    className="text-lg font-semibold cursor-pointer hover:underline"                     
+                    className="text-base font-semibold cursor-pointer hover:underline"                     
                     onClick={() => onProfileClick(user.username)}
                 >
                     {user.name}
@@ -55,14 +55,14 @@ const Post = ({
                 {comments.map((comment, index) => (
                     <div key={index} className="flex items-center mb-2">
                         <img src={comment.profilePic} alt="Commenter" className="mr-2 w-10 h-10 rounded-full object-cover" />
-                        <p className="text-lg">
+                        <p className="text-base">
                             <span 
-                                className="text-gray-700 font-semibold cursor-pointer hover:underline" 
+                                className="text-gray-700 font-semibold cursor-pointer hover:underline mr-2" 
                                 onClick={() => onProfileClick(comment.username)}
                             >
                                 {comment.username}
                             </span>
-                            : {comment.text}
+                            {comment.text}
                         </p>
                     </div>
                 ))}
