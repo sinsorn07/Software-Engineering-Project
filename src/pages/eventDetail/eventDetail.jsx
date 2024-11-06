@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft,FaEllipsisV } from 'react-icons/fa';
 import useScrollDirection from '../../hooks/useScrollDirection';
-import MapComponent from '../../components/map/MapComponent'; // Ensure this path is correct
+import MapComponent from '../../components/map/MapComponent';
+import BackButton from '../../components/backbutton/BackButton';
+import Post from '../../components/post/Post'; 
 import SHJ from '../../assets/shj.jpg';
 
 const EventDetail = () => {
@@ -30,23 +32,47 @@ const EventDetail = () => {
                 { id: 4, username: 'GoldForge', profilePic: 'https://i.pinimg.com/736x/a0/eb/3b/a0eb3b7bd43f1760c7faa41da47eb2af.jpg' },
             ],
         },
-        // Other events can be added here as needed
+        // Additional events can be added here if needed
     };
 
     const event = eventData[id] || {};
     const participants = event.participants || [];
+
+    // Sample data for posts related to the event
+        const eventPosts = [
+            {
+                user: {
+                    name: 'Ichigo',
+                    username: 'ichigo',
+                    profilePic: 'https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg',
+                },
+                time: '10:00 AM', // Separate the time
+                eventName: 'Sung Hyeonje Birthday Party🎂', // Add event name as a separate field
+                content: 'What a wonderful event! Can\'t wait to see everyone there.',
+                image: 'https://i.pinimg.com/474x/22/fd/8c/22fd8c474753173569f5ec106978718a.jpg',
+                likes: 45,
+                comments: [
+                    { username: 'BlackFlame', profilePic: 'https://static1.personality-database.com/profile_images/8b28017ec040491cb89ecf24b031e536.png', text: 'Looking forward to it!' },
+                    { username: 'Honeypot2512', profilePic: 'https://pbs.twimg.com/profile_images/1535154420043788289/VpKXcleb_400x400.jpg', text: 'Excited!' },
+                ],
+            },
+            // Add more posts as needed
+        ];
+
+    const handleProfileLink = (username) => {
+        console.log(`Navigate to profile of ${username}`);
+    };
 
     return (
         <div className="event-detail-page flex flex-col items-center justify-start min-h-screen bg-gray-100 p-8 overflow-y-hidden">
             {/* Box Container for Top Section */}
             <div className="top-section-container bg-white rounded-t-lg shadow-lg w-full max-w-3xl p-6">
                 <div className="header-section flex items-center justify-start mb-8 relative">
-                    <button
-                        className="back-button absolute left-0 bg-gray-100 text-gray-500 p-2 rounded-md hover:bg-pink-500 hover:text-white flex items-center mr-4"
-                    >
-                        <FaArrowLeft className="text-2xl" />
+                    <BackButton onClick={() => console.log("Back button clicked")} /> 
+                    <h2 className="text-3xl font-bold ml-4">{event.eventName || "Event Not Found"}</h2>
+                    <button className="ml-auto text-gray-600 hover:text-gray-800">
+                        <FaEllipsisV className="text-xl" />
                     </button>
-                    <h2 className="text-3xl font-bold ml-12">{event.eventName || "Event Not Found"}</h2>
                 </div>
 
                 {/* Image Section */}
@@ -62,7 +88,7 @@ const EventDetail = () => {
                 <div className="w-full">
                     <h3 className="text-lg font-semibold mb-2">Description</h3>
                     <p className="text-gray-700 mb-4">{event.description || "No description available."}</p>
-                    
+
                     {/* Date & Time */}
                     <h3 className="text-lg font-semibold mb-2">Date & Time</h3>
                     <p className="text-gray-600">
@@ -152,53 +178,28 @@ const EventDetail = () => {
                     )}
 
                     {activeTab === 'Posts' && (
-                        <div className="posts-content text-700 mt-0 bg-white rounded-lg p-4">
-                            <h3 className="text-xl font-semibold mt-0 mb-4">Posts</h3>
-                            {/* Sample post structure */}
-                            <div className="post flex flex-col mb-6 p-4 border bg-white border-gray-200 rounded-md">
-                                {/* User Profile Section */}
-                                <div className="user-profile-section flex items-center mb-4">
-                                    <img
-                                        src="https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg"
-                                        alt="User Avatar"
-                                        className="w-12 h-12 rounded-full mr-3"
-                                    />
-                                    <span className="username font-semibold text-lg">ichigo</span>
-                                </div>
-
-                                {/* Post Description */}
-                                <p className="text-gray-600 mb-4">What a wonderful event! Can't wait to see everyone there.</p>
-
-                                {/* Image Section */}
-                                <div className="image-upload-section mb-4 grid grid-cols-3 gap-4">
-                                    {/* Uploaded image */}
-                                    <div className="image-container border border-gray-300 rounded-md w-full h-48 flex items-center justify-center overflow-hidden">
-                                        <img
-                                            src="https://i.pinimg.com/474x/22/fd/8c/22fd8c474753173569f5ec106978718a.jpg"
-                                            alt="Uploaded"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    {/* Additional empty or placeholder spaces */}
-                                    <div className="image-container border border-gray-300 rounded-md w-full h-48 flex items-center justify-center">
-                                        <label htmlFor="fileInput" className="cursor-pointer text-gray-400 text-3xl">
-                                            +
-                                        </label>
-                                        <input id="fileInput" type="file" className="hidden" />
-                                    </div>
-                                    <div className="image-container border border-white rounded-md w-full h-48"></div>
-                                </div>
-                            </div>
-
-                            {/* Placeholder for more posts */}
-                            <p className="text-gray-500 text-center">More posts will appear here as they are added.</p>
-                        </div>
+                        <>
+                            {/* Display Event Posts Using Post Component */}
+                            {eventPosts.map((post, index) => (
+                                <Post
+                                    key={index}
+                                    user={post.user}
+                                    time={post.time}
+                                    eventName={post.eventName} // Pass the event name
+                                    content={post.content}
+                                    image={post.image}
+                                    likes={post.likes}
+                                    comments={post.comments}
+                                    onProfileClick={handleProfileLink}
+                                />
+                            ))}
+                        </>
                     )}
 
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    };
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export default EventDetail;
