@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaArrowLeft, FaEllipsisV } from 'react-icons/fa';
 import useScrollDirection from '../../hooks/useScrollDirection';
@@ -10,6 +10,10 @@ import SHJ from '../../assets/shj.jpg';
 const EventDetail = () => {
     const { id } = useParams();
     const [activeTab, setActiveTab] = useState('Details');
+    const [showOptions, setShowOptions] = useState(false); // State to control options box visibility
+
+    // Example of a current logged-in user for role checking
+    const currentUser = 'Chain3008'; // Replace with actual current user identifier
 
     const eventData = { // each event detail, including participants
         1: {
@@ -18,7 +22,7 @@ const EventDetail = () => {
             locationName: "Seseong Guild building, Seoul, South Korea",
             latitude: 37.5665, // Example latitude for Seoul
             longitude: 126.9780, // Example longitude for Seoul
-            locationLink: "https://maps.app.goo.gl/v6XtDzX3pfWMmWUm8",
+            locationLink: "https://maps.app.goo.gl/tzBuiQTMahC2KynX7",
             image: SHJ,
             startDate: "30 August 2024",
             endDate: "31 August 2024",
@@ -43,7 +47,7 @@ const EventDetail = () => {
                     eventName: 'Sung Hyeonje Birthday Party🎂',
                     content: 'What a wonderful event! Can\'t wait to see everyone there.',
                     image: 'https://i.pinimg.com/474x/22/fd/8c/22fd8c474753173569f5ec106978718a.jpg',
-                    likes: 45,
+                    likes: 64,
                     comments: [
                         { username: 'BlackFlame', profilePic: 'https://static1.personality-database.com/profile_images/8b28017ec040491cb89ecf24b031e536.png', text: 'Looking forward to it!' },
                         { username: 'Honeypot2512', profilePic: 'https://pbs.twimg.com/profile_images/1535154420043788289/VpKXcleb_400x400.jpg', text: 'Excited!' },
@@ -58,9 +62,44 @@ const EventDetail = () => {
     const participants = event.participants || [];
     const eventPosts = event.posts || [];
 
+    const optionsRef = useRef(null); // Reference for the options box
+    const buttonRef = useRef(null); // Reference for the options button
+
+    // Determine user role based on whether they are the event creator
+    const userRole = currentUser === event.eventCreator ? 'creator' : 'participant';
+
     const handleProfileLink = (username) => {
         console.log(`Navigate to profile of ${username}`);
     };
+
+    const toggleOptions = () => {
+        setShowOptions(!showOptions);
+    };
+
+    const handleEditPost = () => {
+        console.log("Edit post");
+    };
+
+    const handleDeletePost = () => {
+        console.log("Delete post");
+    };
+
+    // Close options box when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                optionsRef.current && !optionsRef.current.contains(event.target) &&
+                buttonRef.current && !buttonRef.current.contains(event.target)
+            ) {
+                setShowOptions(false); // Close options if clicking outside
+            }
+        };
+        
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     return (
         <div className="event-detail-page flex flex-col items-center justify-start min-h-screen bg-gray-100 p-8 overflow-y-hidden">
@@ -69,9 +108,31 @@ const EventDetail = () => {
                 <div className="header-section flex items-center justify-start mb-8 relative">
                     <BackButton onClick={() => console.log("Back button clicked")} /> 
                     <h2 className="text-3xl font-bold ml-4">{event.eventName || "Event Not Found"}</h2>
-                    <button className="ml-auto text-gray-600 hover:text-gray-800">
-                        <FaEllipsisV className="text-xl" />
-                    </button>
+                    
+                    {/* Options Button */}
+                    <div className="relative ml-auto">
+                        <button ref={buttonRef} onClick={toggleOptions} className="text-gray-600 hover:text-gray-800">
+                            <FaEllipsisV className="text-xl" />
+                        </button>
+
+                        {/* Options Box */}
+                        {showOptions && (
+                            <div 
+                                ref={optionsRef} // Attach ref to options box
+                                className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg border border-gray-200 z-50"
+                            >
+                                {userRole === 'creator' ? (
+                                    <>
+                                        <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700">Edit Event</button>
+                                        <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700">Delete Event</button>
+                                    </>
+                                ) : (
+                                    <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700">Leave Event</button>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
                 </div>
 
                 {/* Image Section */}
@@ -109,6 +170,16 @@ const EventDetail = () => {
                             <span className="cursor-pointer font-semibold text-gray-700 text-base hover:underline">{event.eventCreator}</span>
                         </div>
                     )}
+
+                    {/* Join Event Button for participants only */}
+                    {userRole === 'participant' && (
+                        <div className="flex justify-end mt-4">
+                            <button className="px-6 py-2 bg-pink-500 text-white rounded-lg transition">
+                                Join Event
+                            </button>
+                        </div>
+                    )}
+
                 </div>
             </div>
 
@@ -137,20 +208,29 @@ const EventDetail = () => {
                                 <div className="location-details w-1/2 pr-4 flex flex-col justify-center">
                                     <h4 className="text-lg font-semibold text-black ml-2 mb-2 mt-2">Location</h4>
                                     <p className="text-gray-600 ml-2 mb-2">{event.locationName || "Location not specified."}</p>
-                                    {event.locationLink && (
+                                    {event.locationLink ? (
                                         <a href={event.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 ml-2 hover:underline">
                                             View Location on Map
                                         </a>
+                                    ) : (
+                                        <p className="text-gray-500"></p>
                                     )}
                                 </div>
 
-                                <div className="map w-1/2">
-                                    <MapComponent
-                                        latitude={event.latitude}
-                                        longitude={event.longitude}
-                                        locationName={event.locationName}
-                                    />
-                                </div>
+                                {event.locationLink ? (
+                                    <div className="map w-1/2">
+                                        <MapComponent
+                                            latitude={event.latitude}
+                                            longitude={event.longitude}
+                                            locationName={event.locationName}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="map w-1/2 flex items-center justify-center">
+                                        <p className="text-gray-500 text-center">Map Not Available</p>
+                                    </div>
+
+                                )}
                             </div>
 
                             {/* Participants Section */}
@@ -183,7 +263,6 @@ const EventDetail = () => {
 
                     {activeTab === 'Posts' && (
                         <>
-                            {/* Check for posts in the selected event */}
                             {eventPosts.length > 0 ? (
                                 eventPosts.map((post, index) => (
                                     <Post
@@ -195,7 +274,9 @@ const EventDetail = () => {
                                         image={post.image}
                                         likes={post.likes}
                                         comments={post.comments}
-                                        onProfileClick={handleProfileLink}
+                                        onProfileClick={(username) => console.log(`Navigate to profile of ${username}`)}
+                                        onEdit={handleEditPost}
+                                        onDelete={handleDeletePost}
                                     />
                                 ))
                             ) : (
