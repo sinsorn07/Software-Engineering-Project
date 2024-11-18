@@ -2,7 +2,11 @@ import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import CreatePost from "./pages/createPost/CreatePost";
 import CreateEvent from "./pages/createEvent/CreateEvent";
+<<<<<<< HEAD
 import EditEvent from "./pages/editEvent/EditEvent";
+=======
+import Profile from "./pages/profile/Profile";
+>>>>>>> 225cd1d8632226eea5c85a00189042288bf5445d
 import {
   createBrowserRouter,
   RouterProvider,
@@ -11,7 +15,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import Home from "./pages/home/Home";
-import Profile from "./pages/profile/Profile";
+/*import Profile from "./pages/profile/Profile";*/
 import LeftBar from "./components/leftBar/LeftBar";
 import Navbar from "./components/navbar/Navbar";
 
@@ -62,7 +66,7 @@ function App() {
           element: <Home />,
         },
         {
-          path: "/profile/:id",
+          path: "/profile",
           element: <Profile />,
         },
         {
