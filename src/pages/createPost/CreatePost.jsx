@@ -19,7 +19,12 @@ const CreatePost = ({ onClose }) => {
         setImages(images.filter((_, i) => i !== index));
     };
 
-    const isFormComplete = description && images.length > 0;
+    const adjustTextArea = (e) => {
+        e.target.style.height = 'inherit';
+        e.target.style.height = `${e.target.scrollHeight}px`; 
+    };
+
+    const isFormComplete = description > 0;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -60,14 +65,16 @@ const CreatePost = ({ onClose }) => {
                             placeholder="What is happening?"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
+                            onInput={adjustTextArea}
                             rows="4"
+                            style={{ overflow: 'hidden' }} 
                         />
                     </div>
 
                     {/* Image Upload Section */}
                     <div className="image-upload-section mb-4 grid grid-cols-3 gap-4">
                         {/* Render images in each slot */}
-                        {Array.from({ length: 3 }).map((_, index) => (
+                        {images.length > 0 && Array.from({ length: 3 }).map((_, index) => (
                             <div key={index} className="image-upload-container border border-gray-300 rounded-md w-full h-48 flex items-center justify-center overflow-hidden relative">
                                 {images[index] ? (
                                     <>
@@ -79,7 +86,8 @@ const CreatePost = ({ onClose }) => {
                                             <FaTimes />
                                         </button>
                                     </>
-                                ) : index === images.length ? (
+                                ) : index === images.length && images.length < 3 ? (
+                                    // Only show the upload label if there are less than 3 images
                                     <label htmlFor="fileInput" className="cursor-pointer text-gray-400 text-3xl flex items-center justify-center w-full h-full">
                                         +
                                     </label>
@@ -95,14 +103,19 @@ const CreatePost = ({ onClose }) => {
                         />
                     </div>
 
-                    {/* Add Image/Video Button */}
-                    <button className="add-image-button bg-pink-400 text-white py-2 px-4 rounded-md hover:bg-pink-500 flex items-center justify-center w-full h-12">
-                        <FaPhotoVideo className="mr-2" />Add Image/Video
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-}
+                                        <label htmlFor="fileInput" className="add-image-button bg-pink-400 text-white py-2 px-4 rounded-md hover:bg-pink-500 flex items-center justify-center w-full h-12">
+                                            <FaPhotoVideo className="mr-2" />Add Image/Video
+                                        </label>
+                                        <input 
+                                            id="fileInput" 
+                                            type="file" 
+                                            className="hidden"
+                                            onChange={handleImageChange}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    }
 
 export default CreatePost;
