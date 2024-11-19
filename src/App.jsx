@@ -3,6 +3,7 @@ import Register from "./pages/register/Register";
 import CreatePost from "./pages/createPost/CreatePost";
 import CreateEvent from "./pages/createEvent/CreateEvent";
 import EventDetail from "./pages/eventDetail/eventDetail";
+import EditEvent from "./pages/editEvent/EditEvent";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -76,7 +77,14 @@ function App() {
         {
           path: "/event/:id",
           element: <EventDetail />,
-        },               
+        }, 
+        {
+
+          path: "/edit-event",
+
+          element: <EditEvent />,
+
+        },              
       ],
     },
     {

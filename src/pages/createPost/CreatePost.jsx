@@ -1,9 +1,30 @@
 import React, { useState } from 'react';
-import { FaPhotoVideo } from 'react-icons/fa';
+import { FaPhotoVideo, FaArrowLeft, FaTimes } from 'react-icons/fa';
 import "./createPost.scss"; 
 
 const CreatePost = ({ onClose }) => {
     const [description, setDescription] = useState("");
+    const [profileImage, setProfileImage] = useState("https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg");
+    const [username, setUsername] = useState("ichigo");
+    const [images, setImages] = useState([]);
+
+    const handleImageChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setImages([...images, URL.createObjectURL(file)]);
+        }
+    };
+
+    const removeImage = (index) => {
+        setImages(images.filter((_, i) => i !== index));
+    };
+
+    const adjustTextArea = (e) => {
+        e.target.style.height = 'inherit';
+        e.target.style.height = `${e.target.scrollHeight}px`; 
+    };
+
+    const isFormComplete = description > 0;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -14,17 +35,17 @@ const CreatePost = ({ onClose }) => {
                 <div className="content-box flex flex-col">
                     {/* Title & Post Button Section */}
                     <div className="title-post-section flex justify-between items-center py-2 mb-4">
+                        {/* Back Button to the left of Create Post title */}
                         <div className="flex items-center">
-
-                            {/* Back Button to the left of Create Post title */}
-                            <button 
-                                onClick={onClose} 
-                                className="back-button bg-white text-black px-2 py-2 rounded-md hover:bg-gray-200 mr-3 text-3xl">
-                                &lt;
+                            <button onClick={onClose} className="back-button bg-gray-100 text-gray-500 p-2 rounded-md hover:bg-pink-500 hover:text-white mr-2">
+                                <FaArrowLeft className="text-2xl" />
                             </button>
                             <h2 className="text-2xl font-bold">Create Post</h2>
                         </div>
-                        <button className="post-button bg-pink-300 text-white px-4 py-2 rounded-md hover:bg-pink-500 active:bg-pink-600">
+                        <button 
+                            className={`post-button px-4 py-2 rounded-md text-white ${isFormComplete ? 'bg-pink-500 hover:bg-pink-600' : 'bg-pink-200 cursor-not-allowed'}`}
+                            disabled={!isFormComplete}
+                        >
                             Post
                         </button>
                     </div>
@@ -33,8 +54,8 @@ const CreatePost = ({ onClose }) => {
 
                     {/* User Profile Section */}
                     <div className="user-profile-section flex items-center mb-6">
-                        <img src="https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg" alt="User Avatar" className="w-20 h-20 rounded-full mr-4" />
-                        <span className="username font-semibold text-2xl">ichigo</span>
+                        <img src={profileImage} alt="User Avatar" className="w-20 h-20 rounded-full mr-4" />
+                        <span className="username font-semibold text-2xl">{username}</span>
                     </div>
 
                     {/* Description Section */}
@@ -44,43 +65,57 @@ const CreatePost = ({ onClose }) => {
                             placeholder="What is happening?"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
+                            onInput={adjustTextArea}
                             rows="4"
+                            style={{ overflow: 'hidden' }} 
                         />
                     </div>
 
                     {/* Image Upload Section */}
                     <div className="image-upload-section mb-4 grid grid-cols-3 gap-4">
-                        {/* First Square: Display Image */}
-                        <div className="image-upload-container border border-gray-300 rounded-md w-full h-48 flex items-center justify-center overflow-hidden">
-                            <img src="https://i.pinimg.com/474x/22/fd/8c/22fd8c474753173569f5ec106978718a.jpg" 
-                                alt="Uploaded" className="w-full h-full object-cover" />
-                        </div>
-                        
-                        {/* Second Square: Plus Sign */}
-                        <div className="image-upload-container border border-gray-300 rounded-md w-full h-48 flex items-center justify-center">
-                            <label htmlFor="fileInput" className="cursor-pointer text-gray-400 text-3xl">
-                                +
-                            </label>
-                            {/* add image
-                            <input 
-                                id="fileInput" 
-                                type="file" 
-                                className="hidden"
-                            /> */}
-                        </div>
-                        
-                        {/* Third Square: Empty */}
-                        <div className="image-upload-container border border-white rounded-md w-full h-48"></div>
+                        {/* Render images in each slot */}
+                        {images.length > 0 && Array.from({ length: 3 }).map((_, index) => (
+                            <div key={index} className="image-upload-container border border-gray-300 rounded-md w-full h-48 flex items-center justify-center overflow-hidden relative">
+                                {images[index] ? (
+                                    <>
+                                        <img src={images[index]} alt="Uploaded" className="w-full h-full object-cover" />
+                                        <button 
+                                            className="absolute top-1 right-1 text-red-500 text-xl"
+                                            onClick={() => removeImage(index)}
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                    </>
+                                ) : index === images.length && images.length < 3 ? (
+                                    // Only show the upload label if there are less than 3 images
+                                    <label htmlFor="fileInput" className="cursor-pointer text-gray-400 text-3xl flex items-center justify-center w-full h-full">
+                                        +
+                                    </label>
+                                ) : null}
+                            </div>
+                        ))}
+                        {/* Hidden file input for image upload */}
+                        <input 
+                            id="fileInput" 
+                            type="file" 
+                            className="hidden"
+                            onChange={handleImageChange}
+                        />
                     </div>
 
-                    {/* Add Image/Video Button */}
-                    <button className="add-image-button bg-pink-400 text-white py-2 px-4 rounded-md hover:bg-pink-500 flex items-center">
-                        <FaPhotoVideo className="mr-2" />Add Image/Video
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-}
+                                        <label htmlFor="fileInput" className="add-image-button bg-pink-400 text-white py-2 px-4 rounded-md hover:bg-pink-500 flex items-center justify-center w-full h-12">
+                                            <FaPhotoVideo className="mr-2" />Add Image/Video
+                                        </label>
+                                        <input 
+                                            id="fileInput" 
+                                            type="file" 
+                                            className="hidden"
+                                            onChange={handleImageChange}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    }
 
 export default CreatePost;
