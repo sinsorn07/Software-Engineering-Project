@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaPhotoVideo, FaArrowLeft } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const CreateEvent = () => {
     const [eventName, setEventName] = useState("");
@@ -11,6 +12,8 @@ const CreateEvent = () => {
     const [endDate, setEndDate] = useState("");
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
+
+    const navigate = useNavigate();
 
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -30,7 +33,7 @@ const CreateEvent = () => {
             <div className="content-container bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
                 {/* Header Section */}
                 <div className="header-section flex items-center justify-start w-full mb-8 relative">
-                    <button className="back-button absolute left-0 bg-gray-100 text-gray-500 p-2 rounded-md hover:bg-pink-500 hover:text-white">
+                    <button onClick={() => navigate('/')} className="back-button absolute left-0 bg-gray-100 text-gray-500 p-2 rounded-md hover:bg-pink-500 hover:text-white">
                         <FaArrowLeft className="text-2xl" />
                     </button>
                     <h2 className="text-3xl font-bold ml-12">Create Event</h2>
