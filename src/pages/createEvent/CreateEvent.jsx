@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaPhotoVideo, FaArrowLeft } from 'react-icons/fa';
+import { FaPhotoVideo } from 'react-icons/fa';
 import BackButton from '../../components/backbutton/BackButton';
 
 const CreateEvent = () => {
@@ -29,6 +29,7 @@ const CreateEvent = () => {
         <div className="create-event-page flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8 overflow-y-auto">
             {/* Main Content Container */}
             <div className="content-container bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
+                
                 {/* Header Section */}
                 <div className="header-section flex items-center justify-start w-full mb-8 relative">
                     <BackButton onClick={() => console.log("Back button clicked")} /> 

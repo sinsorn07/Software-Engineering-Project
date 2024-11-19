@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisV, faHeart, faCommentAlt } from '@fortawesome/free-solid-svg-icons';
 
-const Profile = () => {
+const ProfileInEventDetail = () => {
     const navigate = useNavigate();
 
     const handleEditProfile = () => {
@@ -18,8 +18,49 @@ const Profile = () => {
         navigate(`/profile/${username}`);
     };
 
+    // Define the data for each post to pass as props to the Post component
+    const posts = [
+        {
+            user: {
+                name: 'Jeongjae Ploy',
+                username: 'username1',
+                profilePic: 'https://voguehk.s3.ap-southeast-1.amazonaws.com/media/2024/10/24164058/Snapinsta.app_318114573_623183596255627_1221795030514672052_n_1080.jpg'
+            },
+            time: '08.23 PM',
+            eventName: 'FanMeeting',
+            content: 'Jeahyun tum arai yu',
+            image: '',
+            likes: 100,
+            comments: [
+                {
+                    username: 'washiraya_',
+                    profilePic: 'https://i.pinimg.com/736x/41/aa/b4/41aab40688396a6958e1ddd774e1d92a.jpg',
+                    text: 'tum tua lhor pai wan2'
+                },
+                {
+                    username: 'nattyham',
+                    profilePic: 'https://pbs.twimg.com/media/GabDc43akAAtT_f?format=jpg&name=4096x4096',
+                    text: 'mai ru'
+                }
+            ]
+        },
+        {
+            user: {
+                name: 'Jeongjae Ploy',
+                username: 'username1',
+                profilePic: 'https://voguehk.s3.ap-southeast-1.amazonaws.com/media/2024/10/24164058/Snapinsta.app_318114573_623183596255627_1221795030514672052_n_1080.jpg'
+            },
+            time: '6.23 PM',
+            eventName: 'FanMeeting',
+            content: '',
+            image: 'https://i.namu.wiki/i/x43BUlBNcMfvk6LIA2eTmNSbgq3OhW-HOODJ0H_-iKm5Wqg_xUO8EERXBvTDulGJ-cVAnjRxDcK-Ox8Qrn8WdQ.webp',
+            likes: 20,
+            comments: []
+        }
+    ];
+
     return (
-        <div className="flex h-screen bg-[#EEEEEE]">
+        <div className="flex h-screen bg-gray-100">
             {/* Profile Main Content */}
             <div className="flex-grow p-6 bg-[#134B70] rounded-lg">
                 <div className="relative mb-10">
@@ -38,7 +79,7 @@ const Profile = () => {
                 {/* Posts Section */}
                 <div className="space-y-8">
                     {/* First Post */}
-                    <div className="bg-[#EEEEEE] rounded-lg p-6 shadow-md max-w-3xl mx-auto">
+                    <div className="bg-white rounded-lg p-6 shadow-md max-w-3xl mx-auto">
                         <div className="flex items-center text-base text-[#201E43] mb-4">
                             <img src="https://voguehk.s3.ap-southeast-1.amazonaws.com/media/2024/10/24164058/Snapinsta.app_318114573_623183596255627_1221795030514672052_n_1080.jpg" alt="User" className="w-10 h-10 rounded-full mr-2" />
                             <span className="text-[#201E43] font-bold cursor-pointer hover:underline" onClick={() => handleProfileLink('username1')}>Jeongjae Ploy</span>
@@ -72,7 +113,7 @@ const Profile = () => {
                     </div>
 
                     {/* Second Post */}
-                    <div className="bg-[#EEEEEE] rounded-lg p-6 shadow-md max-w-3xl mx-auto">
+                    <div className="bg-white rounded-lg p-6 shadow-md max-w-3xl mx-auto">
                         <div className="flex items-center text-base text-[#201E43] mb-4">
                             <img src="https://voguehk.s3.ap-southeast-1.amazonaws.com/media/2024/10/24164058/Snapinsta.app_318114573_623183596255627_1221795030514672052_n_1080.jpg" alt="User" className="w-10 h-10 rounded-full mr-2" />
                             <span className="text-[#201E43] font-bold cursor-pointer hover:underline" onClick={() => handleProfileLink('username1')}>Jeongjae Ploy</span>
@@ -101,4 +142,4 @@ const Profile = () => {
     );
 };
 
-export default Profile;
+export default ProfileInEventDetail;

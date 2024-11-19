@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { FaArrowLeft, FaEllipsisV } from 'react-icons/fa';
+import { FaArrowLeft, FaEllipsisV, FaPen, FaCommentDots, FaArrowUp } from 'react-icons/fa';
 import useScrollDirection from '../../hooks/useScrollDirection';
 import MapComponent from '../../components/map/MapComponent';
 import BackButton from '../../components/backbutton/BackButton';
@@ -13,11 +13,11 @@ const EventDetail = () => {
     const [showOptions, setShowOptions] = useState(false); // State to control options box visibility
 
     // Example of a current logged-in user for role checking
-    const currentUser = 'Chain3008'; // Replace with actual current user identifier
+    const currentUser = 'Ichigo'; // Replace with actual current user identifier
 
     const eventData = { // each event detail, including participants
         1: {
-            eventName: "Sung Hyeonje Birthday Party🎂",
+            eventName: "Seong Hyeonje Birthday Party🎂",
             description: "Greeting Hunters, you are all invited to the Seseong guild leader's birthday party!",
             locationName: "Seseong Guild building, Seoul, South Korea",
             latitude: 37.5665, // Example latitude for Seoul
@@ -51,6 +51,8 @@ const EventDetail = () => {
                     comments: [
                         { username: 'BlackFlame', profilePic: 'https://static1.personality-database.com/profile_images/8b28017ec040491cb89ecf24b031e536.png', text: 'Looking forward to it!' },
                         { username: 'Honeypot2512', profilePic: 'https://pbs.twimg.com/profile_images/1535154420043788289/VpKXcleb_400x400.jpg', text: 'Excited!' },
+                        { username: 'SnowBunnyBYR', profilePic: 'https://64.media.tumblr.com/d211ccfb8f77569e08d21b8a31b16c80/8d6ab8101b440cec-9d/s250x250_c1/ffb41bca040a68772c4ac69ee2295a376b4b2d48.jpg', text: 'It was amazing!' },
+                        { username: 'Ichigo', profilePic: 'https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg', text: 'Great memories!' },
                     ],
                 },
             ],
@@ -84,7 +86,19 @@ const EventDetail = () => {
         console.log("Delete post");
     };
 
-    // Close options box when clicking outside
+    const handleCreatePost = () => {
+        console.log("Navigate to Create Post");
+    };
+
+    const toggleShowAllComments = () => {
+        setShowAllComments((prev) => !prev);
+    };
+
+    const handleOpenChat = () => {
+        console.log("Navigate to Chat");
+    };
+
+       // Close options box when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -174,7 +188,7 @@ const EventDetail = () => {
                     {/* Join Event Button for participants only */}
                     {userRole === 'participant' && (
                         <div className="flex justify-end mt-4">
-                            <button className="px-6 py-2 bg-pink-500 text-white rounded-lg transition">
+                            <button className="px-6 py-2 bg-pink-500 text-white hover:bg-pink-600 rounded-lg transition">
                                 Join Event
                             </button>
                         </div>
@@ -182,6 +196,20 @@ const EventDetail = () => {
 
                 </div>
             </div>
+
+            {/* Floating Action Buttons */}
+            <button 
+                className="fixed bottom-24 right-8 bg-pink-500 hover:bg-pink-600 text-white p-4 rounded-full shadow-lg transition focus:outline-none"
+                onClick={handleOpenChat}
+            >
+                <FaCommentDots className="text-xl" />
+            </button>
+            <button 
+                className="fixed bottom-8 right-8 bg-pink-500 hover:bg-pink-600 text-white p-4 rounded-full shadow-lg transition focus:outline-none"
+                onClick={handleCreatePost}
+            >
+                <FaPen className="text-xl" />
+            </button>         
 
             {/* Navbar Section */}
             <div className="navbar-section w-full max-w-3xl mt-0 rounded-lg sticky top-0 z-10">
