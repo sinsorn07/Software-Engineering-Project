@@ -47,7 +47,7 @@ const EventDetail = () => {
                     eventName: 'Sung Hyeonje Birthday Party🎂',
                     content: 'What a wonderful event! Can\'t wait to see everyone there.',
                     image: 'https://i.pinimg.com/474x/22/fd/8c/22fd8c474753173569f5ec106978718a.jpg',
-                    likes: 64,
+                    likes: 6,
                     comments: [
                         { username: 'BlackFlame', profilePic: 'https://static1.personality-database.com/profile_images/8b28017ec040491cb89ecf24b031e536.png', text: 'Looking forward to it!' },
                         { username: 'Honeypot2512', profilePic: 'https://pbs.twimg.com/profile_images/1535154420043788289/VpKXcleb_400x400.jpg', text: 'Excited!' },
@@ -188,7 +188,7 @@ const EventDetail = () => {
                     {/* Join Event Button for participants only */}
                     {userRole === 'participant' && (
                         <div className="flex justify-end mt-4">
-                            <button className="px-6 py-2 bg-pink-500 text-white hover:bg-pink-600 rounded-lg transition">
+                            <button className="px-6 py-2 bg-[#508C9B] text-white hover:bg-[#134B70] rounded-lg transition">
                                 Join Event
                             </button>
                         </div>
@@ -199,13 +199,13 @@ const EventDetail = () => {
 
             {/* Floating Action Buttons */}
             <button 
-                className="fixed bottom-24 right-8 bg-pink-500 hover:bg-pink-600 text-white p-4 rounded-full shadow-lg transition focus:outline-none"
+                className="fixed bottom-24 right-8 bg-[#508C9B] hover:bg-[#134B70] text-white p-4 rounded-full shadow-lg transition focus:outline-none"
                 onClick={handleOpenChat}
             >
                 <FaCommentDots className="text-xl" />
             </button>
             <button 
-                className="fixed bottom-8 right-8 bg-pink-500 hover:bg-pink-600 text-white p-4 rounded-full shadow-lg transition focus:outline-none"
+                className="fixed bottom-8 right-8 bg-[#508C9B] hover:bg-[#134B70] text-white p-4 rounded-full shadow-lg transition focus:outline-none"
                 onClick={handleCreatePost}
             >
                 <FaPen className="text-xl" />
@@ -216,13 +216,13 @@ const EventDetail = () => {
                 <div className="flex justify-around border-b-2 border-gray-300 bg-white">
                     <button
                         onClick={() => setActiveTab('Details')}
-                        className={`py-2 px-4 ${activeTab === 'Details' ? 'border-b-4 border-pink-500 font-bold' : 'text-gray-600'}`}
+                        className={`py-2 px-4 ${activeTab === 'Details' ? 'border-b-4 border-[#508C9B] font-bold' : 'text-gray-600'}`}
                     >
                         Details
                     </button>
                     <button
                         onClick={() => setActiveTab('Posts')}
-                        className={`py-2 px-4 ${activeTab === 'Posts' ? 'border-b-4 border-pink-500 font-bold' : 'text-gray-600'}`}
+                        className={`py-2 px-4 ${activeTab === 'Posts' ? 'border-b-4 border-[#508C9B] font-bold' : 'text-gray-600'}`}
                     >
                         Posts
                     </button>

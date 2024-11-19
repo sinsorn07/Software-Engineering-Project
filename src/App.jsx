@@ -4,6 +4,7 @@ import CreatePost from "./pages/createPost/CreatePost";
 import CreateEvent from "./pages/createEvent/CreateEvent";
 import EventDetail from "./pages/eventDetail/eventDetail";
 import EditEvent from "./pages/editEvent/EditEvent";
+
 import {
   createBrowserRouter,
   RouterProvider,
@@ -22,17 +23,12 @@ function App() {
   const Layout = () => {
     return (
       <div className="flex h-screen overflow-hidden">
-        {/* Navbar fixed at the top */}
-        <div className="fixed w-full z-10">
-          <Navbar />
-        </div>
-        
-        <div className="flex pt-16 w-full">
+        <div className="flex w-full">
           {/* LeftBar fixed to the left side */}
-          <div className="fixed left-0 top-16 h-full w-60">
+          <div className="fixed left-0 top-0 h-full w-60">
             <LeftBar />
           </div>
-
+  
           {/* Main Content area, scrollable */}
           <div className="ml-60 w-full overflow-y-auto h-full">
             <Outlet />
@@ -41,6 +37,7 @@ function App() {
       </div>
     );
   };
+  
 
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {

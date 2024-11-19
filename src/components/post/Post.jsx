@@ -140,7 +140,7 @@ const Post = ({
                     <FontAwesomeIcon
                         icon={faHeart}
                         className={`text-2xl ${
-                            liked ? "text-pink-500" : "text-gray-500"
+                            liked ? "text-red-500" : "text-gray-500"
                         }`}
                     />
                     <span>{liked ? likes + 1 : likes}</span>
@@ -196,11 +196,11 @@ const Post = ({
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         placeholder="Write a comment..."
-                        className="flex-grow border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        className="flex-grow border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#508C9B]"
                     />
                     <button
                         onClick={handleAddComment}
-                        className="ml-2 bg-pink-500 text-white p-2 rounded-full hover:bg-pink-600 focus:outline-none"
+                        className="ml-2 bg-[#508C9B] text-white p-2 rounded-full hover:bg-[#134B70] focus:outline-none"
                     >
                         <FontAwesomeIcon icon={faPaperPlane} />
                     </button>

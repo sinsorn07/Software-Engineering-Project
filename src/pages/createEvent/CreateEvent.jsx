@@ -163,7 +163,7 @@ const CreateEvent = () => {
                 {/* Create Event Button */}
                 <div className="mt-8 flex justify-center">
                     <button 
-                        className={`px-8 py-3 rounded-md font-semibold ${isFormComplete ? 'bg-pink-500 hover:bg-pink-600 text-white' : 'bg-pink-200 text-white cursor-not-allowed'}`}
+                        className={`px-8 py-3 rounded-md font-semibold ${isFormComplete ? 'bg-[#508C9B] hover:[#134B70] text-white' : 'bg-[#C0DBEA] text-white cursor-not-allowed'}`}
                         disabled={!isFormComplete}
                     >
                         Create Event

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { FaPhotoVideo, FaArrowLeft, FaTimes } from 'react-icons/fa';
-import "./createPost.scss"; 
 
 const CreatePost = ({ onClose }) => {
     const [description, setDescription] = useState("");
