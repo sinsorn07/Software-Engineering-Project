@@ -1,8 +1,17 @@
+import "./tailwind.css";
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import CreatePost from "./pages/createPost/CreatePost";
 import CreateEvent from "./pages/createEvent/CreateEvent";
 import Profile from "./pages/profile/Profile";
+import EditProfile from "./pages/editProfile/EditProfile";
+import OthersProfile from "./pages/othersProfile/OthersProfile.jsx";
+import LeaveEvent from "./components/leaveEvent/LeaveEvent";
+import DeletePost from "./components/deletePost/DeletePost";
+import EditPost from "./components/editPost/EditPost";
+import DeleteEvent from "./components/deleteEvent/DeleteEvent";
+import OptionsPopup from "./components/optionsPopup/OptionsPopup";
+
 import {
   createBrowserRouter,
   RouterProvider,
@@ -41,6 +50,8 @@ function App() {
     );
   };
 
+
+
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
       return <Navigate to="/login" />;
@@ -73,6 +84,34 @@ function App() {
           path: "/create-post",
           element: <CreatePost />,
         },
+        {
+          path: "/edit-profile",
+          element: <EditProfile />,
+        },
+        {
+          path: "/others-profile",
+          element: <OthersProfile />,
+        },
+        {
+          path: "/leave-event",
+          element: <LeaveEvent />,
+        }, 
+        {
+          path: "/delete-post",
+          element: <DeletePost />,
+        },
+        {
+          path: "/edit-post",
+          element: <EditPost />,
+        },  
+        {
+          path: "/delete-event",
+          element: <DeleteEvent />,
+        }, 
+        {
+          path: "/options-popup",
+          element: <OptionsPopup />,
+        },      
       ],
     },
     {

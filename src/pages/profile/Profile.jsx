@@ -19,7 +19,7 @@ const Profile = () => {
     };
 
     return (
-        <div className="flex h-screen bg-[#EEEEEE]">
+        <div className="flex h-screen bg-gray-200">
             {/* Profile Main Content */}
             <div className="flex-grow p-6 bg-[#134B70] rounded-lg">
                 <div className="relative mb-10">
@@ -38,7 +38,7 @@ const Profile = () => {
                 {/* Posts Section */}
                 <div className="space-y-8">
                     {/* First Post */}
-                    <div className="bg-[#EEEEEE] rounded-lg p-6 shadow-md max-w-3xl mx-auto">
+                    <div className="bg-white rounded-lg p-6 shadow-md max-w-3xl mx-auto">
                         <div className="flex items-center text-base text-[#201E43] mb-4">
                             <img src="https://voguehk.s3.ap-southeast-1.amazonaws.com/media/2024/10/24164058/Snapinsta.app_318114573_623183596255627_1221795030514672052_n_1080.jpg" alt="User" className="w-10 h-10 rounded-full mr-2" />
                             <span className="text-[#201E43] font-bold cursor-pointer hover:underline" onClick={() => handleProfileLink('username1')}>Jeongjae Ploy</span>
@@ -72,7 +72,7 @@ const Profile = () => {
                     </div>
 
                     {/* Second Post */}
-                    <div className="bg-[#EEEEEE] rounded-lg p-6 shadow-md max-w-3xl mx-auto">
+                    <div className="bg-white rounded-lg p-6 shadow-md max-w-3xl mx-auto">
                         <div className="flex items-center text-base text-[#201E43] mb-4">
                             <img src="https://voguehk.s3.ap-southeast-1.amazonaws.com/media/2024/10/24164058/Snapinsta.app_318114573_623183596255627_1221795030514672052_n_1080.jpg" alt="User" className="w-10 h-10 rounded-full mr-2" />
                             <span className="text-[#201E43] font-bold cursor-pointer hover:underline" onClick={() => handleProfileLink('username1')}>Jeongjae Ploy</span>
