@@ -24,15 +24,17 @@ function App() {
   // Layout for protected routes
   const Layout = () => {
     return (
-      <div className="flex h-screen overflow-hidden">
-        {/* Left Sidebar */}
-        <div className="fixed left-0 top-0 h-full w-60">
-          <LeftBar />
-        </div>
+      <div className="flex overflow-hidden">
+        <div className="flex w-full">
+          {/* LeftBar fixed to the left side */}
+          <div className="fixed left-0 top-0 h-full w-60">
+            <LeftBar />
+          </div>
 
-        {/* Main Content area */}
-        <div className="ml-60 w-full flex flex-col">
-          <Outlet />
+          {/* Main Content area */}
+          <div className="ml-60 w-full flex flex-col overflow-auto">
+            <Outlet />
+          </div>
         </div>
       </div>
     );
@@ -62,8 +64,9 @@ function App() {
         { path: "/create-event", element: <CreateEvent /> },
         { path: "/edit-event", element: <EditEvent /> },
         { path: "/event/:id", element: <EventDetail /> },
-        { path: "/event/:id/chat", element: <Chat /> },
+        { path: "/event/:id/chat", element: <Chat /> },        
         { path: "/event/:id/create-post", element: <CreatePost /> },
+        
       ],
     },
     { path: "/login", element: <Login /> },
