@@ -22,7 +22,7 @@ export default function Event({ event, isMyEventPage }) {
           />
         </section>
         <section className="p-6">
-          <h1 className="text-base font-medium">{event.eventName}</h1>
+          <h1 className="text-base font-bold text-[#201E43]">{event.eventName}</h1>
           <div className="text-sm text-zinc-700 mt-2">{event.description}</div>
           <div className="flex items-center gap-2 text-sm text-zinc-700 mt-4">
             <span>{event.startDate}</span> - <span>{event.endDate}</span>

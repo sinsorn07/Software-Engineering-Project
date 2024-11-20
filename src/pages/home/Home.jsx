@@ -57,9 +57,9 @@ export default function Home() {
 
   return (
     <div className="flex flex-col w-full h-full overflow-y-scroll bg-gray-100">
-      <header className="py-8 bg-white shadow-lg">
+      <header className="py-8 bg-[#508C9B] shadow-lg">
         <div className="w-[80%] mx-auto relative">
-          <label className="text-lg font-medium text-gray-800 cursor-pointer" htmlFor="search">
+          <label className="text-lg font-bold text-[#201E43] cursor-pointer" htmlFor="search">
             Explore Event
           </label>
           <form

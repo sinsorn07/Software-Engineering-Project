@@ -1,9 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { FaHome, FaUserCircle } from "react-icons/fa";
-import { MdAddCircleOutline, MdPostAdd } from "react-icons/md";
-import { AiOutlineEdit } from "react-icons/ai";
-import { BsChatText } from "react-icons/bs";
 import Meetro from '../../assets/MeetroLogo2.png';
 
 export default function LeftBar() {
@@ -22,10 +19,6 @@ export default function LeftBar() {
   const menus = [
     { to: "/", icon: <FaHome />, label: "Home" },
     { to: "/my-event", icon: <FaUserCircle />, label: "My Event" },
-    { to: "/create-event", icon: <MdAddCircleOutline />, label: "Create Event" },
-    { to: "/edit-event", icon: <AiOutlineEdit />, label: "Edit Event" },
-    { to: "/chat", icon: <BsChatText />, label: "Chat" },
-    { to: "/create-post", icon: <MdPostAdd />, label: "Create Post" },
   ];
 
   return (
@@ -34,20 +27,19 @@ export default function LeftBar() {
       <div className="p-4 border-b border-[#201E43] flex items-center gap-2">
         {/* Logo Image */}
         <img 
-            src={Meetro} 
-            alt="Meetro Logo" 
-            className="w-[32px] h-[32px] object-contain" 
+          src={Meetro} 
+          alt="Meetro Logo" 
+          className="w-[32px] h-[32px] object-contain" 
         />
         
         {/* Logo Text */}
         <Link
-            to="/"
-            className="text-2xl font-bold text-white hover:text-indigo-200"
+          to="/"
+          className="text-2xl font-bold text-white hover:text-indigo-200"
         >
-            Meetro
+          Meetro
         </Link>
-        </div>
-
+      </div>
 
       {/* Profile Section */}
       <Link
