@@ -21,7 +21,7 @@ export default function LeftBar() {
 
   const menus = [
     { to: "/", icon: <FaHome />, label: "Home" },
-    { to: "/my-events", icon: <FaUserCircle />, label: "My Event" },
+    { to: "/my-event", icon: <FaUserCircle />, label: "My Event" },
     { to: "/create-event", icon: <MdAddCircleOutline />, label: "Create Event" },
     { to: "/edit-event", icon: <AiOutlineEdit />, label: "Edit Event" },
     { to: "/chat", icon: <BsChatText />, label: "Chat" },

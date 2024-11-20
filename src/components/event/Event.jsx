@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaLocationArrow } from "react-icons/fa";
 
-export default function Event({ event }) {
+export default function Event({ event, isMyEventPage }) {
   const [isJoined, setIsJoined] = useState(false); // Track if the user has joined the event
 
   const handleJoinClick = (e) => {
@@ -37,17 +37,19 @@ export default function Event({ event }) {
       </Link>
 
       {/* Join Button */}
-      <div className="flex items-center justify-center pb-2 mb-4">
-        <button
-          onClick={handleJoinClick}
-          className={`flex w-[90%] items-center justify-center ${
-            isJoined ? "bg-gray-400 cursor-not-allowed" : "bg-[#508C9B] hover:bg-[#134B70]"
-          } text-white text-sm px-4 py-2 rounded-xl transition-all duration-100`}
-          disabled={isJoined} // Disable button if already joined
-        >
-          {isJoined ? "Joined" : "Join"}
-        </button>
-      </div>
+      {!isMyEventPage && (
+        <div className="flex items-center justify-center pb-2 mb-4">
+          <button
+            onClick={handleJoinClick}
+            className={`flex w-[90%] items-center justify-center ${
+              isJoined ? "bg-gray-400 cursor-not-allowed" : "bg-[#508C9B] hover:bg-[#134B70]"
+            } text-white text-sm px-4 py-2 rounded-xl transition-all duration-100`}
+            disabled={isJoined} // Disable button if already joined
+          >
+            {isJoined ? "Joined" : "Join"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

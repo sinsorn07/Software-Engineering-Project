@@ -6,6 +6,7 @@ import CreateEvent from "./pages/createEvent/CreateEvent";
 import EventDetail from "./pages/eventDetail/EventDetail";
 import EditEvent from "./pages/editEvent/EditEvent";
 import EditProfile from "./pages/editProfile/EditProfile";
+import MyEvent from "./pages/myEvent/MyEvent";
 import Chat from "./pages/chat/Chat";
 import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
@@ -66,6 +67,7 @@ function App() {
         { path: "/event/:id", element: <EventDetail /> },
         { path: "/event/:id/chat", element: <Chat /> },        
         { path: "/event/:id/create-post", element: <CreatePost /> },
+        { path: "/my-event", element: <MyEvent />}
         
       ],
     },
