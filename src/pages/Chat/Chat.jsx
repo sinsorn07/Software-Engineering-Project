@@ -30,7 +30,7 @@ const Chat = () => {
     return (
         <div className="chat-page flex flex-col min-h-screen bg-gray-100">
             {/* Chat Header */}
-            <header className="chat-header bg-[#508C9B] text-white py-4 px-6 flex items-center sticky top-0">
+            <header className="chat-header bg-[#508C9B] text-white py-4 px-6 flex items-center sticky top-0 shadow-lg">
                 <button
                     className="text-white hover:text-gray-300 mr-4"
                     onClick={() => navigate(-1)} // Navigate back
