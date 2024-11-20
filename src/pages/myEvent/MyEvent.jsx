@@ -52,6 +52,23 @@ export default function MyEvent() {
     console.log("Search text:", searchText);
   };
 
+  const getEventDates = () => {
+    // Extract dates from events and convert to Date objects for easy comparison with the calendar tile
+    return events.map((event) => {
+      const startDate = new Date(event.startDate);
+      const endDate = new Date(event.endDate);
+      const dates = [];
+
+      // Create a list of all dates between the event start and end dates (inclusive)
+      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        dates.push(new Date(d));
+      }
+      return dates;
+    }).flat(); // Flatten the array to get a single list of all event dates
+  };
+
+  const eventDates = getEventDates(); // List of event dates
+
   useEffect(() => {
     console.log("Filter changed:", filter);
   }, [filter]);
@@ -63,10 +80,28 @@ export default function MyEvent() {
           <label className="text-lg font-medium text-gray-800 cursor-pointer" htmlFor="calendar">
             My Event
           </label>
-          
-          {/* Calendar component */}
-          <div className="mt-4">
-            <Calendar />
+
+          {/* Center the Calendar and adjust its style */}
+          <div className="mt-6 flex justify-center items-center">
+            <Calendar
+              className="rounded-xl border border-gray-300 shadow-md w-[90%] h-[400px]" // Increase size of calendar
+              tileClassName="text-gray-800 p-4" // Add more space within each day
+              nextLabel={<span className="text-gray-500">→</span>}
+              prevLabel={<span className="text-gray-500">←</span>}
+              // Display event indicator on the tiles
+              tileContent={({ date, view }) => {
+                const isEventDay = eventDates.some(
+                  (eventDate) =>
+                    eventDate.getFullYear() === date.getFullYear() &&
+                    eventDate.getMonth() === date.getMonth() &&
+                    eventDate.getDate() === date.getDate()
+                );
+
+                return isEventDay ? (
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500 mx-auto" />
+                ) : null;
+              }}
+            />
           </div>
         </div>
       </header>
