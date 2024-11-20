@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaArrowLeft, FaEllipsisV, FaPen, FaCommentDots, FaArrowUp } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import useScrollDirection from '../../hooks/useScrollDirection';
 import MapComponent from '../../components/map/MapComponent';
 import BackButton from '../../components/backbutton/BackButton';
@@ -12,8 +13,10 @@ const EventDetail = () => {
     const [activeTab, setActiveTab] = useState('Details');
     const [showOptions, setShowOptions] = useState(false); // State to control options box visibility
 
+    const navigate = useNavigate();
+
     // Example of a current logged-in user for role checking
-    const currentUser = 'Ichigo'; // Replace with actual current user identifier
+    const currentUser = 'Chain3008'; // Replace with actual current user identifier
 
     const eventData = { // each event detail, including participants
         1: {
@@ -87,16 +90,16 @@ const EventDetail = () => {
     };
 
     const handleCreatePost = () => {
-        console.log("Navigate to Create Post");
+        navigate(`/event/${id}/create-post`); // Navigate to CreatePost page with event ID
     };
 
     const toggleShowAllComments = () => {
         setShowAllComments((prev) => !prev);
     };
 
-    const handleOpenChat = () => {
-        console.log("Navigate to Chat");
-    };
+    const handleChatButtonClick = () => {
+        navigate(`/event/${id}/chat`, { state: { eventName: event.eventName } });
+    };    
 
        // Close options box when clicking outside
     useEffect(() => {
@@ -120,7 +123,7 @@ const EventDetail = () => {
             {/* Box Container for Top Section */}
             <div className="top-section-container bg-white rounded-t-lg shadow-lg w-full max-w-3xl p-6">
                 <div className="header-section flex items-center justify-start mb-8 relative">
-                    <BackButton onClick={() => console.log("Back button clicked")} /> 
+                    <BackButton onClick={() => navigate('/')} />
                     <h2 className="text-3xl font-bold ml-4">{event.eventName || "Event Not Found"}</h2>
                     
                     {/* Options Button */}
@@ -200,7 +203,7 @@ const EventDetail = () => {
             {/* Floating Action Buttons */}
             <button 
                 className="fixed bottom-24 right-8 bg-[#508C9B] hover:bg-[#134B70] text-white p-4 rounded-full shadow-lg transition focus:outline-none"
-                onClick={handleOpenChat}
+                onClick={handleChatButtonClick}
             >
                 <FaCommentDots className="text-xl" />
             </button>

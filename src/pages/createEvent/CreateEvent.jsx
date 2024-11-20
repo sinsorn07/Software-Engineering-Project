@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { FaPhotoVideo } from 'react-icons/fa';
+import { FaPhotoVideo, FaArrowLeft } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import BackButton from '../../components/backbutton/BackButton';
 
 const CreateEvent = () => {
@@ -12,6 +13,8 @@ const CreateEvent = () => {
     const [endDate, setEndDate] = useState("");
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
+
+    const navigate = useNavigate();
 
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -32,7 +35,7 @@ const CreateEvent = () => {
                 
                 {/* Header Section */}
                 <div className="header-section flex items-center justify-start w-full mb-8 relative">
-                    <BackButton onClick={() => console.log("Back button clicked")} /> 
+                    <BackButton onClick={() => navigate('/')} /> 
                     <h2 className="text-3xl font-bold ml-4">Create Event</h2>
                 </div>
 
