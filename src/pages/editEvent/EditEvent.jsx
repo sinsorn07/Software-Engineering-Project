@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaPhotoVideo, FaArrowLeft, FaEdit, FaCheck } from 'react-icons/fa';
+import BackButton from '../../components/backbutton/BackButton';
 
 const EditEvent = () => {
     const [eventName, setEventName] = useState("2024 Yuji Birthday Celebration Event");
@@ -51,10 +52,8 @@ const EditEvent = () => {
         <div className="edit-event-page flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8 overflow-y-auto">
             <div className="content-container bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
                 <div className="header-section flex items-center justify-start w-full mb-8 relative">
-                    <button className="back-button absolute left-0 bg-gray-100 text-gray-500 p-2 rounded-md hover:bg-pink-500 hover:text-white">
-                        <FaArrowLeft className="text-2xl" />
-                    </button>
-                    <h2 className="text-3xl font-bold ml-12">Edit Event Details</h2>
+                    <BackButton />
+                    <h2 className="text-3xl font-bold ml-3">Edit Event Details</h2>
                 </div>
 
                 <div className="image-upload-section flex flex-col items-center mb-8">
@@ -84,7 +83,7 @@ const EditEvent = () => {
                     {/* Event Name */}
                     <div className="flex items-center">
                         <label className="block text-lg font-semibold mb-2">Event Name</label>
-                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600 mb-2" onClick={() => toggleEdit("eventName")} />
+                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B] mb-2" onClick={() => toggleEdit("eventName")} />
                     </div>
                     {isEditing.eventName ? (
                         <div className="flex items-center">
@@ -94,7 +93,7 @@ const EditEvent = () => {
                                 onChange={(e) => setEventName(e.target.value)}
                                 className="w-full border border-gray-300 rounded-md p-3"
                             />
-                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600" onClick={() => toggleEdit("eventName")} />
+                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:[#508C9B]" onClick={() => toggleEdit("eventName")} />
                         </div>
                     ) : (
                         <p>{eventName}</p>
@@ -103,7 +102,7 @@ const EditEvent = () => {
                     {/* Description */}
                     <div className="flex items-center">
                         <label className="block text-lg font-semibold mb-2">Description</label>
-                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600 mb-2" onClick={() => toggleEdit("description")} />
+                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:[#508C9B] mb-2" onClick={() => toggleEdit("description")} />
                     </div>
                     {isEditing.description ? (
                         <div className="flex items-center">
@@ -114,7 +113,7 @@ const EditEvent = () => {
                                 placeholder="Enter event description"
                                 rows="4"
                             ></textarea>
-                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600" onClick={() => toggleEdit("description")} />
+                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:[#508C9B]" onClick={() => toggleEdit("description")} />
                         </div>
                     ) : (
                         <p>{description}</p>
@@ -123,7 +122,7 @@ const EditEvent = () => {
                     {/* Location Name */}
                     <div className="flex items-center">
                         <label className="block text-lg font-semibold mb-2">Location</label>
-                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600 mb-2" onClick={() => toggleEdit("locationName")} />
+                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B] mb-2" onClick={() => toggleEdit("locationName")} />
                     </div>
                     {isEditing.locationName ? (
                         <div className="flex items-center">
@@ -133,7 +132,7 @@ const EditEvent = () => {
                                 onChange={(e) => setLocationName(e.target.value)}
                                 className="w-full border border-gray-300 rounded-md p-3"
                             />
-                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600" onClick={() => toggleEdit("locationName")} />
+                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B]" onClick={() => toggleEdit("locationName")} />
                         </div>
                     ) : (
                         <p>{locationName}</p>
@@ -142,7 +141,7 @@ const EditEvent = () => {
                     {/* Location Link */}
                     <div className="flex items-center">
                         <label className="block text-lg font-semibold mb-2">Location Link</label>
-                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600 mb-2" onClick={() => toggleEdit("locationLink")} />
+                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B] mb-2" onClick={() => toggleEdit("locationLink")} />
                     </div>
                     {isEditing.locationLink ? (
                         <div className="flex items-center">
@@ -152,20 +151,20 @@ const EditEvent = () => {
                                 onChange={(e) => setLocationLink(e.target.value)}
                                 className="w-full border border-gray-300 rounded-md p-3"
                             />
-                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600" onClick={() => toggleEdit("locationLink")} />
+                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B]" onClick={() => toggleEdit("locationLink")} />
                         </div>
                     ) : (
                         <p className="w-full">
-                        <a href={locationLink} target="_blank" rel="noopener noreferrer" className="text-black hover:underline hover:text-blue-600">
-                            {locationLink}
-                        </a>
-                    </p>
+                            <a href={locationLink} target="_blank" rel="noopener noreferrer" className="text-black hover:underline hover:text-blue-600">
+                                {locationLink}
+                            </a>
+                        </p>
                     )}
 
                     {/* Start Date */}
                     <div className="flex items-center">
                         <label className="block text-lg font-semibold mb-2">Start Date</label>
-                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600 mb-2" onClick={() => toggleEdit("startDate")} />
+                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B] mb-2" onClick={() => toggleEdit("startDate")} />
                     </div>
                     {isEditing.startDate ? (
                         <div className="flex items-center">
@@ -175,7 +174,7 @@ const EditEvent = () => {
                                 onChange={(e) => setStartDate(e.target.value)}
                                 className="w-full border border-gray-300 rounded-md p-3"
                             />
-                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600" onClick={() => toggleEdit("startDate")} />
+                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B]" onClick={() => toggleEdit("startDate")} />
                         </div>
                     ) : (
                         <p>{startDate}</p>
@@ -184,81 +183,75 @@ const EditEvent = () => {
                     {/* End Date */}
                     <div className="flex items-center">
                         <label className="block text-lg font-semibold mb-2">End Date</label>
-                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600 mb-2" onClick={() => toggleEdit("endDate")} />
+                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B] mb-2" onClick={() => toggleEdit("endDate")} />
                     </div>
                     {isEditing.endDate ? (
                         <div className="flex items-center">
                             <input
                                 type="date"
                                 value={endDate}
-                                min={startDate}
-                                onChange={(e) => {
-                                    const selectedDate = e.target.value;
-                                    if (selectedDate >= startDate) {
-                                        setEndDate(selectedDate);
-                                    }
-                                }}
+                                onChange={(e) => setEndDate(e.target.value)}
                                 className="w-full border border-gray-300 rounded-md p-3"
                             />
-                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600" onClick={() => toggleEdit("endDate")} />
+                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B]" onClick={() => toggleEdit("endDate")} />
                         </div>
                     ) : (
                         <p>{endDate}</p>
                     )}
 
-                 {/* Start Time */}
-            <div className="flex items-center">
-                <label className="block text-lg font-semibold mb-2">Start Time</label>
-                <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600 mb-2" onClick={() => toggleEdit("startTime")} />
-                </div>
-                {isEditing.startTime ? (
+                    {/* Start Time */}
                     <div className="flex items-center">
-                        <input
-                            type="time"
-                            value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
-                            className="w-full border border-gray-300 rounded-md p-3"
-                        />
-                        <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600"
-                            onClick={() => toggleEdit("startTime")}
-                        />
+                        <label className="block text-lg font-semibold mb-2">Start Time</label>
+                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B] mb-2" onClick={() => toggleEdit("startTime")} />
                     </div>
-                ) : (
-                    <p>{startTime}</p>
-                )}
+                    {isEditing.startTime ? (
+                        <div className="flex items-center">
+                            <input
+                                type="time"
+                                value={startTime}
+                                onChange={(e) => setStartTime(e.target.value)}
+                                className="w-full border border-gray-300 rounded-md p-3"
+                            />
+                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B]" onClick={() => toggleEdit("startTime")} />
+                        </div>
+                    ) : (
+                        <p>{startTime}</p>
+                    )}
 
-            {/* End Time */}
-            <div className="flex items-center">
-                <label className="block text-lg font-semibold mb-2">End Time</label>
-                <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600 mb-2" onClick={() => toggleEdit("endTime")} />
-                </div>
-                {isEditing.endTime ? (
+                    {/* End Time */}
                     <div className="flex items-center">
-                        <input
-                            type="time"
-                            value={endTime}
-                            onChange={(e) => setEndTime(e.target.value)}
-                            className="w-full border border-gray-300 rounded-md p-3"
-                        />
-                        <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-pink-600" onClick={() => toggleEdit("endTime")} />
+                        <label className="block text-lg font-semibold mb-2">End Time</label>
+                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B] mb-2" onClick={() => toggleEdit("endTime")} />
                     </div>
-                ) : (
-                    <p>{endTime}</p>
-                )}
-            </div>
+                    {isEditing.endTime ? (
+                        <div className="flex items-center">
+                            <input
+                                type="time"
+                                value={endTime}
+                                onChange={(e) => setEndTime(e.target.value)}
+                                className="w-full border border-gray-300 rounded-md p-3"
+                            />
+                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B]" onClick={() => toggleEdit("endTime")} />
+                        </div>
+                    ) : (
+                        <p>{endTime}</p>
+                    )}
+                </div>
 
-                <div className="mt-8 flex justify-center">
-                    <button 
-                        className={`px-8 py-3 rounded-md font-semibold ${isFormComplete ? 'bg-pink-500 hover:bg-pink-600 text-white' : 'bg-pink-200 text-white cursor-not-allowed'}`}
-                        disabled={!isFormComplete}
+                <div className="footer-section flex justify-center mt-8">
+                    <button
                         onClick={handleSubmit}
+                        className={`w-full bg-[#508C9B] text-white py-3 rounded-md text-lg font-semibold hover:bg-[#134B70] ${
+                            !isFormComplete ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                        disabled={!isFormComplete}
                     >
-                        Confirm
+                        Save Changes
                     </button>
                 </div>
             </div>
         </div>
     );
-}
+};
 
 export default EditEvent;
