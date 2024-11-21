@@ -7,11 +7,15 @@ import MapComponent from '../../components/map/MapComponent';
 import BackButton from '../../components/backbutton/BackButton';
 import Post from '../../components/post/Post'; 
 import SHJ from '../../assets/shj.jpg';
+import LeaveEvent from '../../components/leaveEvent/LeaveEvent';
+import DeleteEvent from '../../components/deleteEvent/DeleteEvent';
 
 const EventDetail = () => {
     const { id } = useParams();
     const [activeTab, setActiveTab] = useState('Details');
     const [showOptions, setShowOptions] = useState(false); // State to control options box visibility
+    const [isLeavePopupOpen, setIsLeavePopupOpen] = useState(false); 
+    const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
 
     const navigate = useNavigate();
 
@@ -101,6 +105,26 @@ const EventDetail = () => {
         navigate(`/event/${id}/chat`, { state: { eventName: event.eventName } });
     };    
 
+    {/*Leave Event Popup Handle Section*/}
+    const handleOpenLeavePopup = () => setIsLeavePopupOpen(true);
+    const handleCloseLeavePopup = () => setIsLeavePopupOpen(false);
+
+    const handleLeaveEvent = () => {
+        console.log('User has left the event');
+        setIsLeavePopupOpen(false);
+        // Add your logic for leaving the event here
+    };
+
+    {/*Delete Event Popup Handle Section*/}
+    const handleOpenDeletePopup = () => setIsDeletePopupOpen(true);
+    const handleCloseDeletePopup = () => setIsDeletePopupOpen(false);
+
+    const handleDeleteEvent = () => {
+        console.log('Event deleted!');
+        setIsDeletePopupOpen(false);
+        navigate('/'); // Navigate back to home or another page after deletion
+    };
+
        // Close options box when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -141,13 +165,27 @@ const EventDetail = () => {
                                 {userRole === 'creator' ? (
                                     <>
                                         <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700">Edit Event</button>
-                                        <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700">Delete Event</button>
+                                        <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700" onClick={handleOpenDeletePopup}>Delete Event</button>
                                     </>
                                 ) : (
-                                    <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700">Leave Event</button>
+                                    <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700" onClick={handleOpenLeavePopup}>Leave Event</button>
                                 )}
                             </div>
                         )}
+
+                        {/* LeaveEvent Popup */}
+                        <LeaveEvent
+                            isOpen={isLeavePopupOpen}
+                            onClose={handleCloseLeavePopup}
+                            onLeave={handleLeaveEvent}
+                        />
+
+                        {/* DeleteEvent Popup */}
+                        <DeleteEvent
+                            isOpen={isDeletePopupOpen}
+                            onClose={handleCloseDeletePopup}
+                            onLeave={handleDeleteEvent}
+                        />
                     </div>
 
                 </div>
