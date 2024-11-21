@@ -1,10 +1,11 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { FaHome, FaUserCircle } from "react-icons/fa";
+import { FaHome, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
 import Meetro from '../../assets/MeetroLogo2.png';
 
 export default function LeftBar() {
   const location = useLocation();
+  const navigate = useNavigate();  // Initialize navigate
 
   const [profileImage, setProfileImage] = useState(
     "https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg"
@@ -20,6 +21,13 @@ export default function LeftBar() {
     { to: "/", icon: <FaHome />, label: "Home" },
     { to: "/my-event", icon: <FaUserCircle />, label: "My Event" },
   ];
+
+  // Logout function to handle user logout
+  const handleLogout = () => {
+    // Clear session or token here (if applicable)
+    // Example: localStorage.removeItem("token");
+    navigate("/login");  // Redirect to login page after logout
+  };
 
   return (
     <nav className="flex flex-col h-full bg-[#134B70] shadow-md">
@@ -78,6 +86,17 @@ export default function LeftBar() {
           </li>
         ))}
       </ul>
+
+      {/* Logout Section */}
+      <div className="flex-grow flex items-end justify-start p-4">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 text-white hover:bg-[#508C9B] p-3 rounded-full mt-auto"
+        >
+          <FaSignOutAlt className="text-xl" />
+          <span>Logout</span>
+        </button>
+      </div>
     </nav>
   );
 }
