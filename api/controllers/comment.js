@@ -25,7 +25,7 @@ export const getComments = [verifyToken, (req, res) => {
     FROM comments AS c 
     JOIN users AS u ON u.id = c.userId 
     WHERE c.postId = ? 
-    ORDER BY c.createdAt DESC
+    ORDER BY c.create_datetime DESC
   `;
 
   db.query(q, [postId], (err, data) => {
@@ -41,12 +41,12 @@ export const addComment = [verifyToken, (req, res) => {
   if (!postId) return res.status(400).json("Post ID is required!");
 
   const q = `
-    INSERT INTO comments(\`desc\`, \`createdAt\`, \`userId\`, \`postId\`) 
+    INSERT INTO comments(\`description\`, \`create_datetime\`, \`userId\`, \`postId\`) 
     VALUES (?)
   `;
 
   const values = [
-    req.body.desc, // Comment description
+    req.body.description, // Comment description
     moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"), // Current timestamp
     req.userInfo.id, // User ID from the token
     postId // Post ID for the comment

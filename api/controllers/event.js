@@ -49,27 +49,46 @@ export const addEvent = [verifyToken, (req, res) => {
     return res.status(400).json("Required fields are missing!");
   }
 
+  // Query to check if the event already exists
   const q = `
-    INSERT INTO events(eventName, description, creator, start_date, end_date, start_time, end_time, img) 
-    VALUES (?)
+    SELECT * FROM events 
+    WHERE eventName = ? AND creator = ? AND start_date = ? AND end_date = ?
   `;
 
-  const values = [
-    eventName,
-    description,
-    req.userInfo.id, // Creator is the logged-in user
-    start_date,
-    end_date,
-    start_time,
-    end_time,
-    img || null // Optional image
-  ];
+  const values = [eventName, req.userInfo.id, start_date, end_date];
 
-  db.query(q, [values], (err, data) => {
+  db.query(q, values, (err, result) => {
     if (err) return res.status(500).json(err);
-    return res.status(200).json("Event has been created.");
+
+    if (result.length > 0) {
+      return res.status(409).json("Event already exists!"); // Return conflict error
+    }
+
+    // If no duplicate event is found, proceed to insert the new event
+    const q = `
+      INSERT INTO events(eventName, description, creator, start_date, end_date, start_time, end_time, img) 
+      VALUES (?)
+    `;
+
+    const values = [
+      eventName,
+      description,
+      req.userInfo.id, // Creator is the logged-in user
+      start_date,
+      end_date,
+      start_time,
+      end_time,
+      img || null // Optional image
+    ];
+
+    db.query(q, [values], (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.status(200).json("Event has been created.");
+    });
   });
 }];
+
+
 
 // Edit an event
 export const editEvent = [verifyToken, (req, res) => {
