@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisV, faHeart, faCommentAlt } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisV, faHeart, faCommentAlt, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -18,11 +18,23 @@ const Profile = () => {
         navigate(`/profile/${username}`);
     };
 
+    const handleGoBack = () => {
+        navigate(-1); // Navigate to the previous page
+    };
+
     return (
         <div className="flex h-screen bg-gray-200">
             {/* Profile Main Content */}
             <div className="flex-grow p-6 bg-[#134B70] rounded-b-lg">
                 <div className="relative mb-10">
+                    {/* Back Button */}
+                    <button 
+                        onClick={handleGoBack} 
+                        className="absolute top-4 left-4 text-white p-2 rounded-full hover:bg-[#1a4d6f]"
+                    >
+                        <FontAwesomeIcon icon={faArrowLeft} />
+                    </button>
+
                     <img src="https://64.media.tumblr.com/374d80a490de6d36d03e776cd07d2e1a/tumblr_prschzIIWW1wtvrjk_1280.jpg" alt="Cover" className="w-full h-[28rem] object-cover rounded-lg" />
                     <div className="absolute top-[19rem] left-1/2 transform -translate-x-1/2 w-56 h-56 border-4 border-[#EEEEEE] rounded-full overflow-hidden z-20">
                         <img src="https://voguehk.s3.ap-southeast-1.amazonaws.com/media/2024/10/24164058/Snapinsta.app_318114573_623183596255627_1221795030514672052_n_1080.jpg" alt="Profile" className="w-full h-full object-cover" />
