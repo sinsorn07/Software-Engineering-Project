@@ -1,9 +1,15 @@
 import express from "express";
-import {  } from "../controllers/post.js";
+import { getPosts, addPost, deletePost } from "../controllers/post.js";
 
+const router = express.Router();
 
-const router = express.Router()
+// Get posts for a specific event
+router.get("/", getPosts);
 
-router.get("",)
+// Add a new post to an event
+router.post("/", addPost);
 
-export default router
+// Delete a post
+router.delete("/:id", deletePost);
+
+export default router;
