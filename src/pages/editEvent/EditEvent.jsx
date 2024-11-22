@@ -1,17 +1,65 @@
 import React, { useState } from 'react';
-import { FaPhotoVideo, FaArrowLeft, FaEdit, FaCheck } from 'react-icons/fa';
+import { useParams, useNavigate } from 'react-router-dom';
+import { FaPhotoVideo, FaEdit, FaCheck } from 'react-icons/fa';
 import BackButton from '../../components/backbutton/BackButton';
 
 const EditEvent = () => {
-    const [eventName, setEventName] = useState("2024 Yuji Birthday Celebration Event");
-    const [description, setDescription] = useState("Join us at PARCO Sendai to celebrate the 2024 birthday of Yuji Itadori, the beloved protagonist from Jujutsu Kaisen!");
-    const [locationName, setLocationName] = useState("PARCO Sendai");
-    const [locationLink, setLocationLink] = useState("https://maps.app.goo.gl/K5cnmkfopP9LpUK36");
-    const [image, setImage] = useState("https://pbs.twimg.com/media/Ew1rrKcVcAI0XzW.jpg");
-    const [startDate, setStartDate] = useState("2024-03-20");
-    const [endDate, setEndDate] = useState("2024-03-20");
-    const [startTime, setStartTime] = useState("09:00");
-    const [endTime, setEndTime] = useState("20:00");
+    const { id } = useParams(); // Get the event ID from the URL
+    const navigate = useNavigate();
+
+    // Mock data for events - Replace with API call or global state in real implementation
+    const events = [
+        {
+            id: 2,
+            eventName: "2024 Yuji Birthday Celebration Event",
+            description: "Join us at PARCO Sendai to celebrate the 2024 birthday of Yuji Itadori, the beloved protagonist from Jujutsu Kaisen!",
+            locationName: "PARCO Sendai",
+            locationLink: "https://maps.app.goo.gl/K5cnmkfopP9LpUK36",
+            image: "https://pbs.twimg.com/media/Ew1rrKcVcAI0XzW.jpg",
+            startDate: "2024-03-20",
+            endDate: "2024-03-20",
+            startTime: "09:00",
+            endTime: "20:00",
+        },
+        {
+            id: 3,
+            eventName: "WONHUI Wedding",
+            description: "The magical union of Wonwoo and Junhui. Join us for their wedding ceremony at the iconic Myeong-dong Cathedral!",
+            locationName: "Myeong-dong Cathedral",
+            locationLink: "https://maps.app.goo.gl/LKooRbcS719gwobu8",
+            image: "https://i.pinimg.com/736x/3f/c3/36/3fc3364d923319dc23cc04b86bae6604.jpg",
+            startDate: "2024-06-10",
+            endDate: "2024-07-17",
+            startTime: "06:40",
+            endTime: "18:40",
+        },
+        {
+            id: 1,
+            eventName: "Seong Hyeonje Birthday Party🎂",
+            description: "Greeting Hunters, you are all invited to the Seseong guild leader's birthday party!",
+            locationName: "Seseong Guild building, Seoul, South Korea",
+            locationLink: "https://maps.app.goo.gl/tzBuiQTMahC2KynX7",
+            image: "https://example.com/shj.jpg",
+            startDate: "2024-08-30",
+            endDate: "2024-08-31",
+            startTime: "10:00",
+            endTime: "17:00",
+        },
+    ];
+
+    // Find the event based on the ID from URL params
+    const event = events.find((event) => event.id === parseInt(id));
+
+    // Initialize states with dynamic event data or fallback values
+    const [eventName, setEventName] = useState(event?.eventName || '');
+    const [description, setDescription] = useState(event?.description || '');
+    const [locationName, setLocationName] = useState(event?.locationName || '');
+    const [locationLink, setLocationLink] = useState(event?.locationLink || '');
+    const [image, setImage] = useState(event?.image || '');
+    const [startDate, setStartDate] = useState(event?.startDate || '');
+    const [endDate, setEndDate] = useState(event?.endDate || '');
+    const [startTime, setStartTime] = useState(event?.startTime || '');
+    const [endTime, setEndTime] = useState(event?.endTime || '');
 
     const [isEditing, setIsEditing] = useState({
         eventName: false,
@@ -45,8 +93,27 @@ const EditEvent = () => {
     const isFormComplete = eventName && description && locationName && locationLink;
 
     const handleSubmit = () => {
-        console.log("Form submitted");
+        // Simulate saving the updated event details
+        console.log({
+            id,
+            eventName,
+            description,
+            locationName,
+            locationLink,
+            image,
+            startDate,
+            endDate,
+            startTime,
+            endTime,
+        });
+
+        // Navigate back to the event details page
+        navigate(`/event/${id}`);
     };
+
+    if (!event) {
+        return <p className="text-center text-gray-500">Event not found!</p>;
+    }
 
     return (
         <div className="edit-event-page flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8 overflow-y-auto">
@@ -61,7 +128,7 @@ const EditEvent = () => {
                         {image ? (
                             <div className="relative w-full h-full">
                                 <img src={image} alt="Uploaded" className="w-full h-full object-cover rounded-md" />
-                                <button 
+                                <button
                                     onClick={removeImage}
                                     className="absolute top-1 right-1 font-bold text-red-500 text-6xl hover:text-red-700 h-12 w-12 rounded-full"
                                     aria-label="Remove image"
@@ -83,7 +150,7 @@ const EditEvent = () => {
                     {/* Event Name */}
                     <div className="flex items-center">
                         <label className="block text-lg font-semibold mb-2">Event Name</label>
-                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B] mb-2" onClick={() => toggleEdit("eventName")} />
+                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B]" onClick={() => toggleEdit('eventName')} />
                     </div>
                     {isEditing.eventName ? (
                         <div className="flex items-center">
@@ -93,7 +160,7 @@ const EditEvent = () => {
                                 onChange={(e) => setEventName(e.target.value)}
                                 className="w-full border border-gray-300 rounded-md p-3"
                             />
-                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:[#508C9B]" onClick={() => toggleEdit("eventName")} />
+                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B]" onClick={() => toggleEdit('eventName')} />
                         </div>
                     ) : (
                         <p>{eventName}</p>
@@ -102,7 +169,7 @@ const EditEvent = () => {
                     {/* Description */}
                     <div className="flex items-center">
                         <label className="block text-lg font-semibold mb-2">Description</label>
-                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:[#508C9B] mb-2" onClick={() => toggleEdit("description")} />
+                        <FaEdit className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B]" onClick={() => toggleEdit('description')} />
                     </div>
                     {isEditing.description ? (
                         <div className="flex items-center">
@@ -110,10 +177,9 @@ const EditEvent = () => {
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 className="w-full border border-gray-300 rounded-md p-3"
-                                placeholder="Enter event description"
                                 rows="4"
-                            ></textarea>
-                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:[#508C9B]" onClick={() => toggleEdit("description")} />
+                            />
+                            <FaCheck className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B]" onClick={() => toggleEdit('description')} />
                         </div>
                     ) : (
                         <p>{description}</p>
@@ -236,6 +302,7 @@ const EditEvent = () => {
                     ) : (
                         <p>{endTime}</p>
                     )}
+                
                 </div>
 
                 <div className="footer-section flex justify-center mt-8">
