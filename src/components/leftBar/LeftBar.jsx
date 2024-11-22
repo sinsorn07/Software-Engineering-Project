@@ -1,115 +1,102 @@
-import "./leftBar.scss"
-import Friends from "../../assets/1.png";
-import Groups from "../../assets/2.png";
-import Market from "../../assets/3.png";
-import Watch from "../../assets/4.png";
-import Memories from "../../assets/5.png";
-import Events from "../../assets/6.png";
-import Gaming from "../../assets/7.png";
-import Gallery from "../../assets/8.png";
-import Videos from "../../assets/9.png";
-import Messages from "../../assets/10.png";
-import Tutorials from "../../assets/11.png";
-import Courses from "../../assets/12.png";
-import Fund from "../../assets/13.png";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { FaHome, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
+import Meetro from '../../assets/MeetroLogo2.png';
 
-const LeftBar = () => {
-    return (
-        <div className="leftBar">
-            <div className="container">
-                <div className="menu">
-                    <div className="user">
-                        {/* <img src="https://images.pexels.com/photos/3228727/pexels-photo-3228727.jpeg?auto=compress&cs=tinysrgb&w=1600" alt="" /> */}
-                        <span>Lapat Chai</span>
-                    </div>
-                    <div className="item">
-                        <img src={Friends} alt="" />
-                        <span>Friends</span>
-                    </div>
-                    <div className="item">
-                        <img src={Groups} alt="" />
-                        <span>Groups</span>
-                    </div>
-                    <div className="item">
-                        <img src={Market} alt="" />
-                        <span>Marketplace</span>
-                    </div>
-                    <div className="item">
-                        <img src={Watch} alt="" />
-                        <span>Watch</span>
-                    </div>
-                    <div className="item">
-                        <img src={Memories} alt="" />
-                        <span>Memories</span>
-                    </div>
-                </div>
-                <hr />
-                <div className="menu">
-                    <span>Your Shortcuts</span>
-                    <div className="item">
-                        <img src={Events} alt="" />
-                        <span>Events</span>
-                    </div>
-                    <div className="item">
-                        <img src={Gaming} alt="" />
-                        <span>Gaming</span>
-                    </div>
-                    <div className="item">
-                        <img src={Gallery} alt="" />
-                        <span>Gallery</span>
-                    </div>
-                    <div className="item">
-                        <img src={Videos} alt="" />
-                        <span>Videos</span>
-                    </div>
-                    <div className="item">
-                        <img src={Messages} alt="" />
-                        <span>Messages</span>
-                    </div>
-                </div>
-                <hr />
-                <div className="menu">
-                    <span>Others</span>
-                    <div className="item">
-                        <img src={Events} alt="" />
-                        <span>Events</span>
-                    </div>
-                    <div className="item">
-                        <img src={Gaming} alt="" />
-                        <span>Gaming</span>
-                    </div>
-                    <div className="item">
-                        <img src={Gallery} alt="" />
-                        <span>Gallery</span>
-                    </div>
-                    <div className="item">
-                        <img src={Videos} alt="" />
-                        <span>Videos</span>
-                    </div>
-                    <div className="item">
-                        <img src={Messages} alt="" />
-                        <span>Messages</span>
-                    </div>
-                </div>
-                <hr />
-                <div className="menu">
-                    <span>Others</span>
-                    <div className="item">
-                        <img src={Fund} alt="" />
-                        <span>Fundraiser</span>
-                    </div>
-                    <div className="item">
-                        <img src={Tutorials} alt="" />
-                        <span>Tutorials</span>
-                    </div>
-                    <div className="item">
-                        <img src={Courses} alt="" />
-                        <span>Courses</span>
-                    </div>
-                </div>
-            </div>
+export default function LeftBar() {
+  const location = useLocation();
+  const navigate = useNavigate();  // Initialize navigate
+
+  const [profileImage, setProfileImage] = useState(
+    "https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg"
+  );
+  const [username, setUsername] = useState("ichigo");
+
+  const profile = {
+    username: username,
+    avatar: profileImage,
+  };
+
+  const menus = [
+    { to: "/", icon: <FaHome />, label: "Home" },
+    { to: "/my-event", icon: <FaUserCircle />, label: "My Event" },
+  ];
+
+  // Logout function to handle user logout
+  const handleLogout = () => {
+    // Clear session or token here (if applicable)
+    // Example: localStorage.removeItem("token");
+    navigate("/login");  // Redirect to login page after logout
+  };
+
+  return (
+    <nav className="flex flex-col h-full bg-[#134B70] shadow-md">
+      {/* Logo Section */}
+      <div className="p-4 border-b border-[#201E43] flex items-center gap-2">
+        {/* Logo Image */}
+        <img 
+          src={Meetro} 
+          alt="Meetro Logo" 
+          className="w-[32px] h-[32px] object-contain" 
+        />
+        
+        {/* Logo Text */}
+        <Link
+          to="/"
+          className="text-2xl font-bold text-white hover:text-indigo-200"
+        >
+          Meetro
+        </Link>
+      </div>
+
+      {/* Profile Section */}
+      <Link
+        to="/profile"
+        className={`flex items-center gap-3 p-4 border-b border-[#201E43] transition-all duration-150 ${
+          location.pathname === "/profile"
+            ? "bg-[#201E43] text-white"
+            : "text-white hover:bg-[#201E43]"
+        }`}
+      >
+        <div className="relative bg-gray-200 w-[60px] h-[60px] rounded-full overflow-hidden">
+          <img
+            src={profile.avatar}
+            alt="Profile Avatar"
+            className="w-full h-full object-cover"
+          />
         </div>
-    )
-}
+        <span className="font-medium text-base text-white">{profile.username}</span>
+      </Link>
 
-export default LeftBar
+      {/* Navigation Menu */}
+      <ul className="flex flex-col p-4 gap-4">
+        {menus.map((item, index) => (
+          <li key={index}>
+            <Link
+              to={item.to}
+              className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-150 ${
+                location.pathname === item.to
+                  ? "bg-[#201E43] text-white"
+                  : "text-white hover:bg-[#201E43]"
+              }`}
+            >
+              <span className="text-xl">{item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+
+      {/* Logout Section */}
+      <div className="flex-grow flex items-end justify-start p-4">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 text-white hover:bg-[#508C9B] p-3 rounded-full mt-auto"
+        >
+          <FaSignOutAlt className="text-xl" />
+          <span>Logout</span>
+        </button>
+      </div>
+    </nav>
+  );
+}
