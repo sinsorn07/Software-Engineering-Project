@@ -1,0 +1,37 @@
+# Node modules
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+
+# Build directories
+/dist
+/build
+
+# IDEs and Editors
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# npm package lock
+package-lock.json
+
+# Temporary files
+*.swp
+*.swo
+
+# Coverage output
+/coverage/
+
+# dotenv files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
