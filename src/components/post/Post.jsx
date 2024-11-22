@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisV, faHeart, faCommentAlt, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { FaEllipsisV, FaHeart, FaCommentAlt, FaPaperPlane } from "react-icons/fa";
+import EditPostPopup from "../editPost/EditPost"; // Assuming this is where the popup component is
 
 const Post = ({
     user,
@@ -10,21 +10,38 @@ const Post = ({
     image,
     likes,
     comments,
+    currentUser,
     onProfileClick,
     onEditPost,
     onDeletePost,
-    onAddComment, // Function to handle adding a new comment
+    onAddComment,
 }) => {
     const [showOptions, setShowOptions] = useState(false);
-    const [showAllComments, setShowAllComments] = useState(false); // State for toggling comments display
-    const [showCommentBox, setShowCommentBox] = useState(false); // State to toggle comment input box
-    const [newComment, setNewComment] = useState(""); // State to store the new comment text
-    const [liked, setLiked] = useState(false); // State to track if the post is liked
-    const optionsRef = useRef(null); // Reference for the options box
-    const buttonRef = useRef(null); // Reference for the button to calculate position
+    const [liked, setLiked] = useState(false);
+    const [showCommentBox, setShowCommentBox] = useState(false);
+    const [newComment, setNewComment] = useState("");
+    const [showEditPostPopup, setShowEditPostPopup] = useState(false); // To show the EditPostPopup
+    const [postContent, setPostContent] = useState(content); // Save initial content
+    const [postImage, setPostImage] = useState(image); // Save initial image
 
-    const toggleOptions = () => {
-        setShowOptions(!showOptions);
+    const optionsRef = useRef(null); // Reference for the options menu
+    const buttonRef = useRef(null); // Reference for the options button
+
+    const toggleOptions = () => setShowOptions(!showOptions);
+
+    const handleEditPost = () => {
+        setShowEditPostPopup(true); // Show the popup
+    };
+
+    const handleSavePost = (updatedPost) => {
+        // Update the post content and image
+        setPostContent(updatedPost.content);
+        setPostImage(updatedPost.image);
+        setShowEditPostPopup(false); // Close the popup
+    };
+
+    const handleLikeToggle = () => {
+        setLiked(!liked);
     };
 
     const handleAddComment = () => {
@@ -34,17 +51,7 @@ const Post = ({
         }
     };
 
-    const handleLikeToggle = () => {
-        setLiked(!liked);
-    };
-
-    const handleDoubleClickLike = () => {
-        if (!liked) {
-            setLiked(true);
-        }
-    };
-
-    // Handle click outside of options box
+    // Close the options menu if clicking outside of it
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -57,15 +64,15 @@ const Post = ({
             }
         };
 
+        // Listen for click outside the options button
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside); // Cleanup
         };
     }, []);
 
     return (
         <div className="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto mb-6 relative">
-            {/* Post Header */}
             <div className="flex items-center text-base text-gray-700 mb-4">
                 <img
                     src={user.profilePic}
@@ -82,51 +89,47 @@ const Post = ({
                     {time} > {eventName}
                 </span>
 
-                {/* Options Button */}
-                <div className="relative ml-auto">
-                    <button
-                        ref={buttonRef}
-                        className="text-gray-600"
-                        onClick={toggleOptions}
-                    >
-                        <FontAwesomeIcon icon={faEllipsisV} />
-                    </button>
-
-                    {/* Options Box */}
-                    {showOptions && (
-                        <div
-                            ref={optionsRef} // Attach ref to options box
-                            className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg border border-gray-200 z-50"
-                            style={{ top: "100%", right: 0 }} // Adjust position relative to the button
+                {/* Options Button (Only for the current user) */}
+                {user.username === currentUser && (
+                    <div className="relative ml-auto">
+                        <button
+                            ref={buttonRef} // Attach ref to button
+                            className="text-gray-600"
+                            onClick={toggleOptions}
                         >
-                            <button
-                                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
-                                onClick={() => {
-                                    onEditPost();
-                                    setShowOptions(false); // Close options after clicking
-                                }}
+                            <FaEllipsisV />
+                        </button>
+                        {showOptions && (
+                            <div
+                                ref={optionsRef} // Attach ref to options menu
+                                className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg border border-gray-200 z-50"
                             >
-                                Edit Post
-                            </button>
-                            <button
-                                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
-                                onClick={() => {
-                                    onDeletePost();
-                                    setShowOptions(false); // Close options after clicking
-                                }}
-                            >
-                                Delete Post
-                            </button>
-                        </div>
-                    )}
-                </div>
+                                <button
+                                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
+                                    onClick={handleEditPost}
+                                >
+                                    Edit Post
+                                </button>
+                                <button
+                                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
+                                    onClick={() => {
+                                        onDeletePost();
+                                        setShowOptions(false);
+                                    }}
+                                >
+                                    Delete Post
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Post Content */}
-            {content && <p className="text-gray-700 mb-3 text-base">{content}</p>}
-            {image && (
-                <div className="mb-3" onDoubleClick={handleDoubleClickLike}>
-                    <img src={image} alt="Post" className="w-2/3 mx-auto" />
+            {postContent && <p className="text-gray-700 mb-3 text-base">{postContent}</p>}
+            {postImage && (
+                <div className="mb-3">
+                    <img src={postImage} alt="Post" className="w-2/3 mx-auto" />
                 </div>
             )}
 
@@ -135,13 +138,9 @@ const Post = ({
                 <div
                     className="flex items-center space-x-1 cursor-pointer"
                     onClick={handleLikeToggle}
-                    onDoubleClick={handleDoubleClickLike}
                 >
-                    <FontAwesomeIcon
-                        icon={faHeart}
-                        className={`text-2xl ${
-                            liked ? "text-red-500" : "text-gray-500"
-                        }`}
+                    <FaHeart
+                        className={`text-2xl ${liked ? "text-red-500" : "text-gray-500"}`}
                     />
                     <span>{liked ? likes + 1 : likes}</span>
                 </div>
@@ -149,42 +148,37 @@ const Post = ({
                     className="flex items-center space-x-1 cursor-pointer"
                     onClick={() => setShowCommentBox(!showCommentBox)}
                 >
-                    <FontAwesomeIcon
-                        icon={faCommentAlt}
-                        className="text-2xl text-gray-500"
-                    />
+                    <FaCommentAlt className="text-2xl text-gray-500" />
                     <span>{comments.length}</span>
                 </div>
             </div>
 
             {/* Comments Section */}
             <div className="mt-3 text-gray-700">
-                {(showAllComments ? comments : comments.slice(0, 2)).map(
-                    (comment, index) => (
-                        <div key={index} className="flex items-center mb-2">
-                            <img
-                                src={comment.profilePic}
-                                alt="Commenter"
-                                className="mr-2 w-10 h-10 rounded-full object-cover"
-                            />
-                            <p className="text-base">
-                                <span
-                                    className="text-gray-700 font-semibold cursor-pointer hover:underline mr-2"
-                                    onClick={() => onProfileClick(comment.username)}
-                                >
-                                    {comment.username}
-                                </span>
-                                {comment.text}
-                            </p>
-                        </div>
-                    )
-                )}
+                {comments.slice(0, 2).map((comment, index) => (
+                    <div key={index} className="flex items-center mb-2">
+                        <img
+                            src={comment.profilePic}
+                            alt="Commenter"
+                            className="mr-2 w-10 h-10 rounded-full object-cover"
+                        />
+                        <p className="text-base">
+                            <span
+                                className="text-gray-700 font-semibold cursor-pointer hover:underline mr-2"
+                                onClick={() => onProfileClick(comment.username)}
+                            >
+                                {comment.username}
+                            </span>
+                            {comment.text}
+                        </p>
+                    </div>
+                ))}
                 {comments.length > 2 && (
                     <button
                         className="text-blue-600 hover:underline text-base"
-                        onClick={() => setShowAllComments(!showAllComments)}
+                        onClick={() => setShowCommentBox(!showCommentBox)}
                     >
-                        {showAllComments ? "Show less" : "Show more"}
+                        {showCommentBox ? "Show less" : "Show more"}
                     </button>
                 )}
             </div>
@@ -202,9 +196,20 @@ const Post = ({
                         onClick={handleAddComment}
                         className="ml-2 bg-[#508C9B] text-white p-2 rounded-full hover:bg-[#134B70] focus:outline-none"
                     >
-                        <FontAwesomeIcon icon={faPaperPlane} />
+                        <FaPaperPlane />
                     </button>
                 </div>
+            )}
+
+            {/* Edit Post Popup */}
+            {showEditPostPopup && (
+                <EditPostPopup
+                    isOpen={showEditPostPopup}
+                    onClose={() => setShowEditPostPopup(false)}
+                    postContent={postContent}
+                    postImage={postImage}
+                    onSave={handleSavePost}
+                />
             )}
         </div>
     );

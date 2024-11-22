@@ -63,7 +63,7 @@ function App() {
         { path: "/profile", element: <Profile /> },
         { path: "/edit-profile", element: <EditProfile /> },
         { path: "/create-event", element: <CreateEvent /> },
-        { path: "/edit-event", element: <EditEvent /> },
+        { path: "/edit-event/:id", element: <EditEvent /> },
         { path: "/event/:id", element: <EventDetail /> },
         { path: "/event/:id/chat", element: <Chat /> },        
         { path: "/event/:id/create-post", element: <CreatePost /> },

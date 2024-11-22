@@ -1,63 +1,142 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { FaTimes, FaPhotoVideo } from "react-icons/fa";
 
-const EditPostPopup = ({ isOpen, onClose }) => {
+const EditPostPopup = ({ isOpen, onClose, postContent, postImage, onSave }) => {
+  // State to manage the updated content and image
+  const [content, setContent] = useState(postContent || "");
+  const [images, setImages] = useState(postImage ? [postImage] : []); // Initialize with passed image
+
+  // Handle image upload
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImages([...images, URL.createObjectURL(e.target.files[0])]); // Add new image to images array
+    }
+  };
+
+  // Remove image from the images array
+  const removeImage = (index) => {
+    setImages(images.filter((_, i) => i !== index)); // Remove selected image
+  };
+
+  // Save changes and close the popup
+  const handleSave = () => {
+    if (content.trim() === "") {
+      alert("Post content cannot be empty!");
+      return;
+    }
+    onSave({ content, image: images }); // Pass updated content and images
+    onClose(); // Close the popup
+  };
+
+  useEffect(() => {
+    setContent(postContent); // Ensure the content is updated when prop changes
+    setImages(postImage ? [postImage] : []); // Ensure the image is updated when prop changes
+  }, [postContent, postImage]);
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       {/* Popup Container */}
-      <div className="bg-[#EEEEEE] rounded-lg p-6 shadow-lg w-3/4 md:w-1/2">
-        {/* Header */}
-        <div className="flex justify-between items-center border-b pb-3 mb-4">
-          <h2 className="text-xl font-semibold text-[#134B70]">Edit Post</h2>
+      <div className="bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full relative z-50">
+        {/* Title and Close Button */}
+        <div className="flex justify-between items-center py-2 mb-4">
+          <div className="flex items-center">
+            <button className="text-gray-600" onClick={onClose}>
+              <FaTimes className="text-2xl" />
+            </button>
+            <h2 className="text-2xl font-bold ml-4">Edit Post</h2>
+          </div>
+          {/* Save Changes Button */}
           <button
-            onClick={onClose}
-            className="text-[#134B70] hover:text-[#508C9B]"
+            onClick={handleSave}
+            className={`post-button px-4 py-2 rounded-md text-white ${
+              content && images.length > 0
+                ? "bg-[#508C9B] hover:bg-[#134B70]"
+                : "bg-[#C0DBEA] cursor-not-allowed"
+            }`}
+            disabled={!content && images.length === 0}
           >
-            Done
+            Save Changes
           </button>
         </div>
 
-        {/* User Info */}
-        <div className="flex items-center mb-4">
-          <img
-            src="https://voguehk.s3.ap-southeast-1.amazonaws.com/media/2024/10/24164058/Snapinsta.app_318114573_623183596255627_1221795030514672052_n_1080.jpg"
-            alt="User"
-            className="w-12 h-12 rounded-full mr-4"
-          />
-          <span className="text-[#201E43] font-bold">username1</span>
-        </div>
+        <hr className="my-2" />
 
-        {/* Text Area */}
-        <textarea
-          placeholder="What is happening?"
-          className="w-full p-3 border border-[#508C9B] rounded-md text-[#201E43] focus:outline-none focus:ring-2 focus:ring-[#134B70] mb-4"
-          rows={3}
-        ></textarea>
-
-        {/* Media Section */}
-        <div className="flex space-x-4 mb-4">
-          {/* Image Placeholder */}
-          <div className="w-20 h-20 border-2 border-dashed border-[#508C9B] flex items-center justify-center rounded-md">
-            <span className="text-[#508C9B] text-2xl">+</span>
-          </div>
-          {/* Existing Images */}
-          <img
-            src="https://via.placeholder.com/150"
-            alt="Existing"
-            className="w-20 h-20 object-cover rounded-md"
-          />
-          <img
-            src="https://via.placeholder.com/150"
-            alt="Existing"
-            className="w-20 h-20 object-cover rounded-md"
+        {/* Description Textarea */}
+        <div className="description-section mb-4">
+          <textarea
+            className="description-input border border-gray-300 rounded-md w-full p-3 text-gray-600"
+            placeholder="What is happening?"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows="4"
+            style={{ overflow: "hidden", resize: "none" }}
           />
         </div>
 
-        {/* Upload Button */}
-        <button className="flex items-center justify-center w-full p-2 bg-[#134B70] text-[#EEEEEE] rounded-md hover:bg-[#508C9B]">
-          <span>Upload Image/Video</span>
-        </button>
+        {/* Image Upload Section */}
+        <div className="image-upload-section mb-4 grid grid-cols-3 gap-4">
+          {images.length > 0 &&
+            Array.from({ length: 3 }).map((_, index) => {
+              // Check if there is an image or if the index is for a placeholder
+              if (index < images.length) {
+                return (
+                  <div
+                    key={index}
+                    className="image-upload-container border border-gray-300 rounded-md w-full h-48 flex items-center justify-center overflow-hidden relative"
+                  >
+                    <img
+                      src={images[index]}
+                      alt="Uploaded"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      className="absolute top-1 right-1 text-red-500 text-xl"
+                      onClick={() => removeImage(index)} // Remove image
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                );
+              }
+              // If index is equal to the number of images, show the placeholder (+) if images < 3
+              if (images.length < 3 && index === images.length) {
+                return (
+                  <div
+                    key={index}
+                    className="image-upload-container border border-gray-300 rounded-md w-full h-48 flex items-center justify-center overflow-hidden relative"
+                  >
+                    <label
+                      htmlFor="fileInput"
+                      className="cursor-pointer text-gray-400 text-3xl flex items-center justify-center w-full h-full"
+                    >
+                      +
+                    </label>
+                  </div>
+                );
+              }
+              return null; // Don't display the placeholder if images are 3 or more
+            })}
+        </div>
+
+        {/* Add Image Button, Only Visible If Images < 3 */}
+        {images.length < 3 && (
+          <label
+            htmlFor="fileInput"
+            className="add-image-button bg-[#508C9B] text-white py-2 px-4 rounded-md hover:bg-[#134B70] flex items-center justify-center w-full h-12"
+          >
+            <FaPhotoVideo className="mr-2" />
+            Add Image/Video
+          </label>
+        )}
+
+        <input
+          id="fileInput"
+          type="file"
+          className="hidden"
+          onChange={handleImageChange} // Handle image upload
+        />
       </div>
     </div>
   );
