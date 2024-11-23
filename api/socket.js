@@ -1,21 +1,32 @@
-const socketIO = require('socket.io');
+import { Server as SocketIO } from "socket.io";
 
-module.exports = (server) => {
-  const io = socketIO(server);
+// Export a function that sets up WebSocket logic
+export default (server) => {
+  const io = new SocketIO(server, {
+    cors: {
+      origin: "http://localhost:3000", // Allow requests from React frontend
+      methods: ["GET", "POST"],
+    },
+  });
 
-  io.on('connection', (socket) => {
-    console.log('User connected');
+  io.on("connection", (socket) => {
+    console.log("User connected");
 
-    socket.on('joinGroup', (groupId) => {
-      socket.join(groupId);
+    // Join a specific event chat room
+    socket.on("joinEvent", (eventId) => {
+      socket.join(eventId);
+      console.log(`User joined event: ${eventId}`);
     });
 
-    socket.on('message', (data) => {
-      io.to(data.groupId).emit('message', data);
+    // Handle messages sent to an event
+    socket.on("message", (data) => {
+      io.to(data.eventId).emit("message", data);
+      console.log(`Message sent to event ${data.eventId}:`, data);
     });
 
-    socket.on('disconnect', () => {
-      console.log('User disconnected');
+    // Handle disconnection
+    socket.on("disconnect", () => {
+      console.log("User disconnected");
     });
   });
 };
