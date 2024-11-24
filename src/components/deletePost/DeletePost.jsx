@@ -15,14 +15,14 @@ const DeleteEvent = ({ isOpen, onClose, onDelete }) => {
           {/* Cancel Button */}
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-400 text-[#EEEEEE] rounded-md hover:bg-gray-500 focus:ring-4 focus:ring-[#508C9B] w-32"
+            className="px-4 py-2 bg-gray-400 text-[#EEEEEE] rounded-md hover:bg-gray-500 focus:ring-4 focus:ring-[#508C9B]"
           >
             Cancel
           </button>
           {/* Delete Button */}
           <button
             onClick={onDelete}
-            className="px-4 py-2 bg-[#508C9B] text-[#EEEEEE] rounded-md hover:bg-[#134B70] focus:ring-4 focus:ring-[#134B70] w-32"
+            className="px-4 py-2 bg-[#508C9B] text-[#EEEEEE] rounded-md hover:bg-[#134B70] focus:ring-4 focus:ring-[#134B70]"
           >
             Delete
           </button>
