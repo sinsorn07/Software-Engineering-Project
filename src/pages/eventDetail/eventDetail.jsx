@@ -20,7 +20,7 @@ const EventDetail = () => {
     const navigate = useNavigate();
 
     // Example of a current logged-in user for role checking
-    const currentUser = 'Chain3008'; // Replace with actual current user identifier
+    const currentUser = 'ichigo'; // Replace with actual current user identifier
 
     const eventData = { // each event detail, including participants
         1: {
@@ -35,18 +35,19 @@ const EventDetail = () => {
             endDate: "31 August 2024",
             startTime: "10:00",
             endTime: "17:00",
+            creatorProfilePic: "https://payhip.com/cdn-cgi/image/format=auto/https://pe56d.s3.amazonaws.com/o_1i5b6afha13qt1ti2hht1dsi1ql515.png",
             eventCreator: "Chain3008",
             participants: [
                 { id: 1, username: 'BlackFlame', profilePic: 'https://static1.personality-database.com/profile_images/8b28017ec040491cb89ecf24b031e536.png' },
                 { id: 2, username: 'Honeypot2512', profilePic: 'https://pbs.twimg.com/profile_images/1535154420043788289/VpKXcleb_400x400.jpg' },
                 { id: 3, username: 'SnowBunnyBYR', profilePic: 'https://64.media.tumblr.com/d211ccfb8f77569e08d21b8a31b16c80/8d6ab8101b440cec-9d/s250x250_c1/ffb41bca040a68772c4ac69ee2295a376b4b2d48.jpg' },
                 { id: 4, username: 'GoldForge', profilePic: 'https://i.pinimg.com/736x/a0/eb/3b/a0eb3b7bd43f1760c7faa41da47eb2af.jpg' },
-                { id: 5, username: 'Ichigo', profilePic: 'https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg' }
+                { id: 5, username: 'ichigo', profilePic: 'https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg' }
             ],
             posts: [
                 {
                     user: {
-                        name: 'Ichigo',
+                        name: 'ichigo',
                         username: 'ichigo',
                         profilePic: 'https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg',
                     },
@@ -59,7 +60,7 @@ const EventDetail = () => {
                         { username: 'BlackFlame', profilePic: 'https://static1.personality-database.com/profile_images/8b28017ec040491cb89ecf24b031e536.png', text: 'Looking forward to it!' },
                         { username: 'Honeypot2512', profilePic: 'https://pbs.twimg.com/profile_images/1535154420043788289/VpKXcleb_400x400.jpg', text: 'Excited!' },
                         { username: 'SnowBunnyBYR', profilePic: 'https://64.media.tumblr.com/d211ccfb8f77569e08d21b8a31b16c80/8d6ab8101b440cec-9d/s250x250_c1/ffb41bca040a68772c4ac69ee2295a376b4b2d48.jpg', text: 'It was amazing!' },
-                        { username: 'Ichigo', profilePic: 'https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg', text: 'Great memories!' },
+                        { username: 'ichigo', profilePic: 'https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg', text: 'Great memories!' },
                     ],
                 },
             ],
@@ -76,7 +77,8 @@ const EventDetail = () => {
             endDate: "20 March 2024",
             startTime: "09:00",
             endTime: "20:00",
-            eventCreator: "Ichigo",
+            eventCreator: "ichigo",
+            creatorProfilePic: "https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg",
             participants: [],
             posts: [],
         },
@@ -92,7 +94,8 @@ const EventDetail = () => {
             endDate: "17 July 2024",
             startTime: "06:40",
             endTime: "18:40",
-            eventCreator: "Ichigo",
+            eventCreator: "ichigo",
+            creatorProfilePic: "https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg",
             participants: [],
             posts: [],
         },
@@ -115,6 +118,10 @@ const EventDetail = () => {
 
     const toggleOptions = () => {
         setShowOptions(!showOptions);
+    };
+
+    const handleEditEvent = () => {
+        navigate(`/edit-event/${id}`);
     };
 
     const handleEditPost = () => {
@@ -196,7 +203,8 @@ const EventDetail = () => {
                             >
                                 {userRole === 'creator' ? (
                                     <>
-                                        <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700">Edit Event</button>
+                                        <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700" onClick={handleEditEvent}> Edit Event </button>
+                                        
                                         <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700" onClick={handleOpenDeletePopup}>Delete Event</button>
                                     </>
                                 ) : (
@@ -247,16 +255,19 @@ const EventDetail = () => {
 
                     {/* Event Creator */}
                     {event.eventCreator && (
-                        <div className="flex items-center text-black-600 mb-4">
-                            <strong className="mr-2">Event Creator:</strong>
-                            <img 
-                                src="https://payhip.com/cdn-cgi/image/format=auto/https://pe56d.s3.amazonaws.com/o_1i5b6afha13qt1ti2hht1dsi1ql515.png" 
-                                alt="Profile" 
-                                className="w-8 h-8 rounded-full object-cover mr-2"
-                            />
-                            <span className="cursor-pointer font-semibold text-gray-700 text-base hover:underline">{event.eventCreator}</span>
-                        </div>
-                    )}
+                    <div className="flex items-center text-black-600 mb-4">
+                        <strong className="mr-2">Event Creator:</strong>
+                        <img 
+                            src={event.creatorProfilePic} 
+                            alt={`${event.eventCreator}'s profile`} 
+                            className="w-8 h-8 rounded-full object-cover mr-2"
+                        />
+                        <span className="cursor-pointer font-semibold text-gray-700 text-base hover:underline">
+                            {event.eventCreator}
+                        </span>
+                    </div>
+                )}
+
 
                     {/* Join Event Button for participants only */}
                     {userRole === 'participant' && (
@@ -378,6 +389,7 @@ const EventDetail = () => {
                                         onProfileClick={(username) => console.log(`Navigate to profile of ${username}`)}
                                         onEdit={handleEditPost}
                                         onDelete={handleDeletePost}
+                                        currentUser={currentUser}
                                     />
                                 ))
                             ) : (

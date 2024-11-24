@@ -1,26 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
+import { createBrowserRouter, RouterProvider, Navigate, Outlet } from "react-router-dom";
+import LeftBar from "./components/leftBar/LeftBar";
+import LogoutPopup from "./components/logout/Logout"; // 引入 LogoutPopup 组件
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import CreatePost from "./pages/createPost/CreatePost";
 import CreateEvent from "./pages/createEvent/CreateEvent";
-import EventDetail from "./pages/eventDetail/EventDetail";
+import EventDetail from "./pages/eventDetail/eventDetail";
 import EditEvent from "./pages/editEvent/EditEvent";
 import EditProfile from "./pages/editProfile/EditProfile";
 import MyEvent from "./pages/myEvent/MyEvent";
 import Chat from "./pages/chat/Chat";
 import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
-import LeftBar from "./components/leftBar/LeftBar";
-
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Navigate,
-  Outlet,
-} from "react-router-dom";
 
 function App() {
-  const currentUser = true; // Simulating user authentication (you can replace this with actual authentication logic)
+  const currentUser = true; 
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false);
 
   // Layout for protected routes
   const Layout = () => {
@@ -28,12 +24,12 @@ function App() {
       <div className="flex overflow-hidden">
         <div className="flex w-full">
           {/* LeftBar fixed to the left side */}
-          <div className="fixed left-0 top-0 h-full w-60">
-            <LeftBar />
+          <div className="fixed left-0 top-0 h-full w-60 z-50">
+            <LeftBar handleLogoutPopup={() => setShowLogoutPopup(true)} />
           </div>
 
           {/* Main Content area */}
-          <div className="ml-60 w-full flex flex-col overflow-auto">
+          <div className="ml-60 w-full flex flex-col overflow-auto z-0">
             <Outlet />
           </div>
         </div>
@@ -49,7 +45,11 @@ function App() {
     return children;
   };
 
-  // Define router
+  const handleLogout = () => {
+    console.log("Logged out!");
+    setShowLogoutPopup(false);
+  };
+
   const router = createBrowserRouter([
     {
       path: "/",
@@ -63,19 +63,29 @@ function App() {
         { path: "/profile", element: <Profile /> },
         { path: "/edit-profile", element: <EditProfile /> },
         { path: "/create-event", element: <CreateEvent /> },
-        { path: "/edit-event", element: <EditEvent /> },
+        { path: "/edit-event/:id", element: <EditEvent /> },
         { path: "/event/:id", element: <EventDetail /> },
-        { path: "/event/:id/chat", element: <Chat /> },        
+        { path: "/event/:id/chat", element: <Chat /> },
         { path: "/event/:id/create-post", element: <CreatePost /> },
-        { path: "/my-event", element: <MyEvent />}
-        
+        { path: "/my-event", element: <MyEvent /> }
       ],
     },
     { path: "/login", element: <Login /> },
     { path: "/register", element: <Register /> },
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      {showLogoutPopup && (
+        <LogoutPopup
+          isOpen={showLogoutPopup}
+          onClose={() => setShowLogoutPopup(false)}
+          onLogout={handleLogout}
+        />
+      )}
+      <RouterProvider router={router} />
+    </>
+  );
 }
 
 export default App;

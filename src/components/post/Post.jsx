@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisV, faHeart, faCommentAlt, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import EditPostPopup from "../editPost/EditPost"; // Ensure EditPostPopup is imported correctly
+import DeletePostPopup from "../deletePost/DeletePost"; // Ensure DeletePostPopup is imported correctly
 
 const Post = ({
     user,
@@ -10,28 +12,46 @@ const Post = ({
     image,
     likes,
     comments,
+    currentUser, // Ensure currentUser is passed as prop
     onProfileClick,
     onEditPost,
     onDeletePost,
     onAddComment, // Function to handle adding a new comment
 }) => {
     const [showOptions, setShowOptions] = useState(false);
-    const [showAllComments, setShowAllComments] = useState(false); // State for toggling comments display
-    const [showCommentBox, setShowCommentBox] = useState(false); // State to toggle comment input box
-    const [newComment, setNewComment] = useState(""); // State to store the new comment text
-    const [liked, setLiked] = useState(false); // State to track if the post is liked
-    const optionsRef = useRef(null); // Reference for the options box
-    const buttonRef = useRef(null); // Reference for the button to calculate position
+    const [liked, setLiked] = useState(false);
+    const [showCommentBox, setShowCommentBox] = useState(false);
+    const [showAllComments, setShowAllComments] = useState(false); // For showing all comments
+    const [newComment, setNewComment] = useState(""); // New comment text state
+    const [showEditPostPopup, setShowEditPostPopup] = useState(false); // To show the Edit Post popup
+    const [showDeletePostPopup, setShowDeletePostPopup] = useState(false); // To show the Delete Post popup
+    const [postContent, setPostContent] = useState(content); // Save initial content
+    const [postImage, setPostImage] = useState(image); // Save initial image
+
+    const optionsRef = useRef(null); 
+    const buttonRef = useRef(null);
 
     const toggleOptions = () => {
         setShowOptions(!showOptions);
     };
 
-    const handleAddComment = () => {
-        if (newComment.trim()) {
-            onAddComment(newComment);
-            setNewComment("");
-        }
+    const handleEditPost = () => {
+        setShowEditPostPopup(true); // Show the Edit Post popup
+    };
+
+    const handleDeletePost = () => {
+        setShowDeletePostPopup(true); // Show the Delete Post popup
+    };
+
+    const handleSavePost = (updatedPost) => {
+        setPostContent(updatedPost.content);
+        setPostImage(updatedPost.image);
+        setShowEditPostPopup(false); // Close the popup
+    };
+
+    const handleDeleteConfirmation = () => {
+        onDeletePost();
+        setShowDeletePostPopup(false); // Close the popup
     };
 
     const handleLikeToggle = () => {
@@ -44,7 +64,14 @@ const Post = ({
         }
     };
 
-    // Handle click outside of options box
+    const handleAddComment = () => {
+        if (newComment.trim()) {
+            onAddComment(newComment);
+            setNewComment("");
+        }
+    };
+
+    // Close the options menu if clicking outside of it
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -83,43 +110,36 @@ const Post = ({
                 </span>
 
                 {/* Options Button */}
-                <div className="relative ml-auto">
-                    <button
-                        ref={buttonRef}
-                        className="text-gray-600"
-                        onClick={toggleOptions}
-                    >
-                        <FontAwesomeIcon icon={faEllipsisV} />
-                    </button>
-
-                    {/* Options Box */}
-                    {showOptions && (
-                        <div
-                            ref={optionsRef} // Attach ref to options box
-                            className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg border border-gray-200 z-50"
-                            style={{ top: "100%", right: 0 }} // Adjust position relative to the button
+                {user.username === currentUser && (
+                    <div className="relative ml-auto">
+                        <button
+                            ref={buttonRef}
+                            className="text-gray-600"
+                            onClick={toggleOptions}
                         >
-                            <button
-                                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
-                                onClick={() => {
-                                    onEditPost();
-                                    setShowOptions(false); // Close options after clicking
-                                }}
+                            <FontAwesomeIcon icon={faEllipsisV} />
+                        </button>
+                        {showOptions && (
+                            <div
+                                ref={optionsRef}
+                                className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg border border-gray-200 z-50"
                             >
-                                Edit Post
-                            </button>
-                            <button
-                                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
-                                onClick={() => {
-                                    onDeletePost();
-                                    setShowOptions(false); // Close options after clicking
-                                }}
-                            >
-                                Delete Post
-                            </button>
-                        </div>
-                    )}
-                </div>
+                                <button
+                                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
+                                    onClick={handleEditPost}
+                                >
+                                    Edit Post
+                                </button>
+                                <button
+                                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
+                                    onClick={handleDeletePost}
+                                >
+                                    Delete Post
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Post Content */}
@@ -205,6 +225,26 @@ const Post = ({
                         <FontAwesomeIcon icon={faPaperPlane} />
                     </button>
                 </div>
+            )}
+
+            {/* Edit Post Popup */}
+            {showEditPostPopup && (
+                <EditPostPopup
+                    isOpen={showEditPostPopup}
+                    onClose={() => setShowEditPostPopup(false)}
+                    postContent={postContent}
+                    postImage={postImage}
+                    onSave={handleSavePost}
+                />
+            )}
+
+            {/* Delete Post Popup */}
+            {showDeletePostPopup && (
+                <DeletePostPopup
+                    isOpen={showDeletePostPopup}
+                    onClose={() => setShowDeletePostPopup(false)} // Close without deleting
+                    onDelete={handleDeleteConfirmation} // Confirm deletion
+                />
             )}
         </div>
     );
