@@ -20,7 +20,7 @@ const EventDetail = () => {
     const navigate = useNavigate();
 
     // Example of a current logged-in user for role checking
-    const currentUser = 'Chain3008'; // Replace with actual current user identifier
+    const currentUser = 'ichigo'; // Replace with actual current user identifier
 
     const eventData = { // each event detail, including participants
         1: {
