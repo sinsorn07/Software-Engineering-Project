@@ -2,10 +2,16 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FaHome, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
 import Meetro from '../../assets/MeetroLogo2.png';
+import LogoutPopup from "../logout/Logout";
 
 export default function LeftBar() {
   const location = useLocation();
   const navigate = useNavigate();  // Initialize navigate
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+
+  const handleLogoutPopup = () => {
+    setShowLogoutPopup(true); // Fix the spelling error from `ture` to `true`
+  };
 
   const [profileImage, setProfileImage] = useState(
     "https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg"
@@ -90,13 +96,22 @@ export default function LeftBar() {
       {/* Logout Section */}
       <div className="flex-grow flex items-end justify-start p-4">
         <button
-          onClick={handleLogout}
+          onClick={handleLogoutPopup}
           className="flex items-center gap-3 text-white hover:bg-[#508C9B] p-3 rounded-full mt-auto"
         >
           <FaSignOutAlt className="text-xl" />
           <span>Logout</span>
         </button>
       </div>
+
+      {/* Show Logout Popup */}
+      {showLogoutPopup && (
+        <LogoutPopup
+          isOpen={showLogoutPopup}
+          onClose={() => setShowLogoutPopup(false)} // Close the popup when Cancel is clicked
+          onLogout={handleLogout}  // Logout when the user confirms
+        />
+      )}
     </nav>
   );
 }
