@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaPhotoVideo, FaEdit, FaCheck } from 'react-icons/fa';
 import BackButton from '../../components/backbutton/BackButton';
+import SHJ from '../../assets/shj.jpg';
 
 const EditEvent = () => {
     const { id } = useParams(); // Get the event ID from the URL
@@ -39,7 +40,7 @@ const EditEvent = () => {
             description: "Greeting Hunters, you are all invited to the Seseong guild leader's birthday party!",
             locationName: "Seseong Guild building, Seoul, South Korea",
             locationLink: "https://maps.app.goo.gl/tzBuiQTMahC2KynX7",
-            image: "https://example.com/shj.jpg",
+            image: SHJ,
             startDate: "2024-08-30",
             endDate: "2024-08-31",
             startTime: "10:00",
