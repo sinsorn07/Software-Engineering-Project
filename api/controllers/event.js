@@ -14,11 +14,13 @@ const verifyToken = (req, res, next) => {
 
 // Get all events (Home Page)
 export const getAllEvents = (req, res) => {
-  const q = `SELECT e.*, u.name AS creatorName 
-             FROM events AS e 
-             JOIN users AS u ON u.id = e.creator 
-             ORDER BY e.start_date DESC`;
-
+  const q = `
+    SELECT e.*, u.name AS creatorName, l.location_name, l.link
+    FROM events AS e
+    JOIN users AS u ON u.id = e.creator
+    LEFT JOIN location AS l ON l.eventId = e.id
+    ORDER BY e.start_date DESC
+  `;
   db.query(q, (err, data) => {
     if (err) return res.status(500).json(err);
     return res.status(200).json(data); // Send all events to the client
@@ -27,13 +29,15 @@ export const getAllEvents = (req, res) => {
 
 // Get events joined by the user (MyEvent Page)
 export const getUserEvents = [verifyToken, (req, res) => {
-  const q = `SELECT e.*, u.name AS creatorName 
-             FROM events AS e 
-             JOIN users AS u ON u.id = e.creator 
-             JOIN participants AS p ON p.eventId = e.id 
-             WHERE p.userId = ? 
-             ORDER BY e.start_date DESC`;
-
+  const q = `
+    SELECT e.*, u.name AS creatorName, l.location_name, l.link
+    FROM events AS e
+    JOIN users AS u ON u.id = e.creator
+    JOIN participants AS p ON p.eventId = e.id
+    LEFT JOIN location AS l ON l.eventId = e.id
+    WHERE p.userId = ?
+    ORDER BY e.start_date DESC
+  `;
   db.query(q, [req.userInfo.id], (err, data) => {
     if (err) return res.status(500).json(err);
     return res.status(200).json(data); // Send events joined by the user
@@ -42,12 +46,12 @@ export const getUserEvents = [verifyToken, (req, res) => {
 
 // Add a new event
 export const addEvent = [verifyToken, (req, res) => {
-  const { eventName, description, start_date, end_date, start_time, end_time, img } = req.body;
+  const { eventName, description, start_date, end_date, start_time, end_time, img, location_name, link } = req.body;
 
   // Validation for required fields
-  if (!eventName || !start_date || !end_date) {
-    return res.status(400).json("Required fields are missing!");
-  }
+  // if (!eventName || !start_date || !end_date || !location_name || !link) {
+  //   return res.status(400).json("Required fields are missing!");
+  // }
 
   // Query to check if the event already exists
   const q = `
@@ -61,10 +65,10 @@ export const addEvent = [verifyToken, (req, res) => {
     if (err) return res.status(500).json(err);
 
     if (result.length > 0) {
-      return res.status(409).json("Event already exists!"); // Return conflict error
+      return res.status(409).json("Event already exists!");
     }
 
-    // If no duplicate event is found, proceed to insert the new event
+    // Insert into events table
     const q = `
       INSERT INTO events(eventName, description, creator, start_date, end_date, start_time, end_time, img) 
       VALUES (?)
@@ -83,22 +87,40 @@ export const addEvent = [verifyToken, (req, res) => {
 
     db.query(q, [values], (err, data) => {
       if (err) return res.status(500).json(err);
-      return res.status(200).json("Event has been created.");
+
+      const eventId = data.insertId; // Get the newly created event ID
+
+      // Insert into location table
+      const q = `
+        INSERT INTO location(location_name, link, eventId)
+        VALUES (?, ?, ?)
+      `;
+
+      const values = [location_name, link, eventId];
+
+      db.query(q, values, (err, locationResult) => {
+        if (err) return res.status(500).json(err);
+
+        return res.status(200).json("Event has been created.");
+      });
     });
   });
 }];
 
 
 
+
+
 // Edit an event
 export const editEvent = [verifyToken, (req, res) => {
-  const { eventName, description, start_date, end_date, start_time, end_time, img } = req.body;
+  const { eventName, description, start_date, end_date, start_time, end_time, img, location_name, link } = req.body;
 
   // Validation for required fields
   if (!eventName || !start_date || !end_date) {
     return res.status(400).json("Required fields are missing!");
   }
 
+  // Update event details in the events table
   const q = `
     UPDATE events 
     SET eventName = ?, description = ?, start_date = ?, end_date = ?, start_time = ?, end_time = ?, img = ? 
@@ -119,10 +141,29 @@ export const editEvent = [verifyToken, (req, res) => {
 
   db.query(q, values, (err, data) => {
     if (err) return res.status(500).json(err);
-    if (data.affectedRows > 0) return res.status(200).json("Event updated successfully.");
+
+    if (data.affectedRows > 0) {
+      // If location details are provided, update them in the location table
+      if (location_name && link) {
+        const locationUpdateQuery = `
+          UPDATE location 
+          SET location_name = ?, link = ? 
+          WHERE eventId = ?
+        `;
+        const locationUpdateValues = [location_name, link, req.params.id];
+
+        db.query(locationUpdateQuery, locationUpdateValues, (err) => {
+          if (err) return res.status(500).json({ error: "Event updated, but location update failed", details: err });
+        });
+      }
+
+      return res.status(200).json("Event updated successfully.");
+    }
+
     return res.status(403).json("You can only edit your own events.");
   });
 }];
+
 
 // Delete an event
 export const deleteEvent = [verifyToken, (req, res) => {

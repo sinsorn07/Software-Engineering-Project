@@ -2,71 +2,58 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaPen } from "react-icons/fa";
 import Event from "../../components/event/Event";
-import SHJ from '../../assets/shj.jpg';
+import { useQuery } from "@tanstack/react-query";
+import { makeRequest } from "../../axios";
 
 export default function Home() {
+  // Fetch events from the backend
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["events"],
+    queryFn: () => makeRequest.get("/events").then((res) => res.data),
+  });
+
+  // State for search and filter
   const [filter, setFilter] = useState("latest");
   const [searchText, setSearchText] = useState("");
-  const [events, setEvents] = useState([
-    {
-      id: 2, // Unique identifier for each event
-      eventName: "2024 Yuji Birthday Celebration Event",
-      description: "Join us at PARCO Sendai to celebrate the 2024 birthday of Yuji Itadori, the beloved protagonist from Jujutsu Kaisen!",
-      locationName: "PARCO Sendai",
-      locationLink: "https://maps.app.goo.gl/K5cnmkfopP9LpUK36",
-      image: "https://pbs.twimg.com/media/Ew1rrKcVcAI0XzW.jpg",
-      startDate: "2024-03-20",
-      endDate: "2024-03-20",
-      startTime: "09:00",
-      endTime: "20:00",
-    },
-    {
-      id: 3,
-      eventName: "WONHUI Wedding",
-      description: "The magical union of Wonwoo and Junhui. Join us for their wedding ceremony at the iconic Myeong-dong Cathedral!",
-      locationName: "Myeong-dong Cathedral",
-      locationLink: "https://maps.app.goo.gl/LKooRbcS719gwobu8",
-      image: "https://i.pinimg.com/736x/3f/c3/36/3fc3364d923319dc23cc04b86bae6604.jpg",
-      startDate: "2024-06-10",
-      endDate: "2024-07-17",
-      startTime: "06:40",
-      endTime: "18:40",
-    },
-    {
-      id: 1, // Unique ID for Seong Hyeonje Birthday Party
-      eventName: "Seong Hyeonje Birthday Party🎂",
-      description: "Greeting Hunters, you are all invited to the Seseong guild leader's birthday party!",
-      locationName: "Seseong Guild building, Seoul, South Korea",
-      locationLink: "https://maps.app.goo.gl/tzBuiQTMahC2KynX7",
-      image: SHJ,
-      startDate: "2024-08-30",
-      endDate: "2024-08-31",
-      startTime: "10:00",
-      endTime: "17:00",
-    },
-  ]);
-  
+  const [events, setEvents] = useState([]);
 
-  const actionSearch = () => {
-    console.log("Search text:", searchText);
-  };
-
+  // Populate events when data is fetched from backend
   useEffect(() => {
-    console.log("Filter changed:", filter);
-  }, [filter]);
+    if (data) setEvents(data);
+  }, [data]);
+
+  // Filtering Logic
+  const filteredEvents = events.filter((event) => {
+    if (filter === "latest") {
+      return true; // Default: Show all events
+    } else if (filter === "hit") {
+      return event.isPopular; // Assuming `isPopular` exists in your event data
+    }
+    return true;
+  });
+
+  // Search Logic
+  const searchedEvents = filteredEvents.filter((event) =>
+    event.eventName.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  // Format Date Helper Function
+  const formatDate = (date) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(date).toLocaleDateString(undefined, options);
+  };
 
   return (
     <div className="flex flex-col w-full h-full overflow-y-scroll bg-gray-100">
       <header className="py-8 bg-[#508C9B] shadow-lg">
         <div className="w-[80%] mx-auto relative">
-          <label className="text-lg font-bold text-[#201E43] cursor-pointer" htmlFor="search">
-            Explore Event
+          <label className="text-lg font-bold text-[#201E43]" htmlFor="search">
+            Explore Events
           </label>
           <form
             className="mt-3"
             onSubmit={(e) => {
               e.preventDefault();
-              actionSearch();
             }}
           >
             <input
@@ -101,9 +88,51 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 mt-6">
-          {events.map((event, index) => (
-            <Event key={index} event={event} />
-          ))}
+          {isLoading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <p>Something went wrong!</p>
+          ) : (
+            searchedEvents.map((event, index) => (
+              <Event
+                key={index}
+                event={{
+                  eventName: event.eventName,
+                  description: event.description,
+                  locationName: event.location_name,
+                  startDate: formatDate(event.start_date),
+                  endDate: formatDate(event.end_date),
+                  image: event.img,
+                }}
+                className="flex flex-col justify-between rounded-lg bg-white shadow-lg p-4"
+              >
+                <div className="flex flex-col gap-2">
+                  <img
+                    src={event.img}
+                    alt={event.eventName}
+                    className="h-48 w-full rounded-lg object-cover"
+                  />
+                  <h3 className="text-xl font-bold text-[#201E43]">
+                    {event.eventName}
+                  </h3>
+                  <p className="text-sm text-gray-600">{event.description}</p>
+                  <p className="text-sm text-gray-500">
+                    {formatDate(event.start_date)} - {formatDate(event.end_date)}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    <span className="text-[#508C9B] font-semibold">
+                      {event.location_name || "Location not provided"}
+                    </span>
+                  </p>
+                </div>
+                <button
+                  className="mt-auto rounded-full bg-[#508C9B] px-6 py-2 text-white hover:bg-[#134B70] transition-all duration-200"
+                >
+                  Join
+                </button>
+              </Event>
+            ))
+          )}
         </div>
 
         <Link
