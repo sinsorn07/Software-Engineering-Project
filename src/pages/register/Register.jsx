@@ -1,7 +1,42 @@
 import { Link } from "react-router-dom";
 import Meetro from '../../assets/MeetroLogo2.png';
+import { useState } from "react";
+import axios from "axios";
 
 const Register = () => {
+    const [inputs, setInputs] = useState({
+        username: "",
+        email: "",
+        password: "",
+        name: "",
+    });
+    const [err, setErr] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const handleChange = (e) => {
+        setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleClick = async (e) => {
+        e.preventDefault();
+
+        // Simple validation
+        if (!inputs.username || !inputs.email || !inputs.password || !inputs.name) {
+            setErr("All fields are required!");
+            return;
+        }
+
+        setErr(null); // Clear previous errors
+        setLoading(true); // Start loading
+        try {
+            await axios.post("http://localhost:8800/api/auth/register", inputs);
+            setLoading(false); // Stop loading
+        } catch (err) {
+            setErr(err.response.data);
+            setLoading(false); // Stop loading
+        }
+    };
+
     return (
         <div className="h-screen bg-gradient-to-r from-[#134B70] via-[#508C9B] to-[#EEEEEE] flex items-center justify-center">
             <div className="w-3/5 bg-white rounded-lg shadow-lg overflow-hidden flex flex-row-reverse min-h-[400px]">
@@ -34,27 +69,42 @@ const Register = () => {
                 <div className="flex-1 p-6 flex flex-col gap-6 justify-center">
                     <h1 className="text-3xl text-gray-600">Register</h1>
                     <form className="flex flex-col gap-4">
-                        <input 
-                            type="text" 
-                            placeholder="Username" 
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            name="username"
+                            onChange={handleChange}
                             className="border-b-2 border-gray-300 p-3 focus:outline-none focus:border-[#508C9B]"
                         />
-                        <input 
-                            type="email" 
-                            placeholder="Email" 
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            name="email"
+                            onChange={handleChange}
                             className="border-b-2 border-gray-300 p-3 focus:outline-none focus:border-[#508C9B]"
                         />
-                        <input 
-                            type="password" 
-                            placeholder="Password" 
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            name="password"
+                            onChange={handleChange}
                             className="border-b-2 border-gray-300 p-3 focus:outline-none focus:border-[#508C9B]"
                         />
-                        <input 
-                            type="text" 
-                            placeholder="Name" 
+                        <input
+                            type="text"
+                            placeholder="Name"
+                            name="name"
+                            onChange={handleChange}
                             className="border-b-2 border-gray-300 p-3 focus:outline-none focus:border-[#508C9B]"
                         />
-                        <button className="w-28 p-2 bg-[#508C9B] text-white font-bold rounded-md hover:bg-[#134B70] mx-auto">Register</button>
+                        {err && <p className="text-red-500 text-sm">{err}</p>}
+                        <button
+                            onClick={handleClick}
+                            className="w-28 p-2 bg-[#508C9B] text-white font-bold rounded-md hover:bg-[#134B70] mx-auto"
+                            disabled={loading}
+                        >
+                            {loading ? "Loading..." : "Register"}
+                        </button>
                     </form>
                 </div>
             </div>

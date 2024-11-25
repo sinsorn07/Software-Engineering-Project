@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import CreatePost from "./pages/createPost/CreatePost";
@@ -11,6 +11,11 @@ import Chat from "./pages/chat/Chat";
 import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
 import LeftBar from "./components/leftBar/LeftBar";
+import { AuthContext } from "./context/authContext"; // Import AuthContext
+import {
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
 
 import {
   createBrowserRouter,
@@ -20,11 +25,14 @@ import {
 } from "react-router-dom";
 
 function App() {
-  const currentUser = true; // Simulating user authentication (you can replace this with actual authentication logic)
+  const { currentUser } = useContext(AuthContext); 
+
+  const queryClient = new QueryClient()
 
   // Layout for protected routes
   const Layout = () => {
     return (
+      <QueryClientProvider client={queryClient}>
       <div className="flex overflow-hidden">
         <div className="flex w-full">
           {/* LeftBar fixed to the left side */}
@@ -38,6 +46,7 @@ function App() {
           </div>
         </div>
       </div>
+      </QueryClientProvider>
     );
   };
 

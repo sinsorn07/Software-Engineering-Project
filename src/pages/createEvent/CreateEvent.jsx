@@ -1,180 +1,234 @@
-import React, { useState } from 'react';
-import { FaPhotoVideo, FaArrowLeft } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import BackButton from '../../components/backbutton/BackButton';
+import React, { useState } from "react";
+import { FaPhotoVideo } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import BackButton from "../../components/backbutton/BackButton";
+import axios from "axios";
 
 const CreateEvent = () => {
-    const [eventName, setEventName] = useState("");
-    const [description, setDescription] = useState("");
-    const [locationName, setLocationName] = useState("");
-    const [locationLink, setLocationLink] = useState("");
-    const [image, setImage] = useState(null);
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    const [startTime, setStartTime] = useState("");
-    const [endTime, setEndTime] = useState("");
+  const [inputs, setInputs] = useState({
+    eventName: "",
+    description: "",
+    locationName: "",
+    locationLink: "",
+    start_date: "",
+    end_date: "",
+    start_time: "",
+    end_time: "",
+  });
+  const [image, setImage] = useState(null); // Store selected image file
+  const [err, setErr] = useState(null); // Handle errors
+  const [loading, setLoading] = useState(false); // Show loading state
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleImageChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setImage(URL.createObjectURL(file));
-        }
-    };
-    const removeImage = () => {
-        setImage(null);
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setInputs((prev) => ({ ...prev, [name]: value }));
+  };
 
-    const isFormComplete = eventName && description && locationName && locationLink;
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]); // Set the image file for upload
+    }
+  };
 
-    return (
-        <div className="create-event-page flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8 overflow-y-auto">
-            {/* Main Content Container */}
-            <div className="content-container bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
-                
-                {/* Header Section */}
-                <div className="header-section flex items-center justify-start w-full mb-8 relative">
-                    <BackButton onClick={() => navigate('/')} /> 
-                    <h2 className="text-3xl font-bold ml-4">Create Event</h2>
-                </div>
+  const handleCreateEvent = async (e) => {
+    e.preventDefault();
+  
+    // Ensure required fields are filled
+    if (!inputs.eventName || !inputs.description || !inputs.startDate || !inputs.endDate || !inputs.locationName || !inputs.locationLink) {
+      setErr("Required fields are missing!");
+      return;
+    }
+  
+    setLoading(true);
+    setErr(null);
+  
+    try {
+      // Create a FormData object
+      const formData = new FormData();
+      formData.append("eventName", inputs.eventName);
+      formData.append("description", inputs.description);
+      formData.append("location_name", inputs.locationName);
+      formData.append("link", inputs.locationLink);
+      formData.append("start_date", inputs.startDate);
+      formData.append("end_date", inputs.endDate);
+      formData.append("start_time", inputs.startTime || "00:00");
+      formData.append("end_time", inputs.endTime || "00:00");
+  
+      if (image) {
+        formData.append("file", image);
+      }
+  
+      // Send POST request to the backend
+      await axios.post("http://localhost:8800/api/events", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true, // Include cookies for authentication
+      });
+  
+      navigate("/"); // Redirect to home on success
+    } catch (error) {
+      setErr(error.response?.data || "An error occurred while creating the event.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
 
-                {/* Image Upload Section */}
-                <div className="image-upload-section flex flex-col items-center mb-8">
-                    <div className="image-frame w-full bg-gray-200 rounded-md flex items-center justify-center mb-4 relative" style={{ aspectRatio: '16 / 9' }}>
-                        {image ? (
-                            <div className="relative w-full h-full">
-                                <img src={image} alt="Uploaded" className="w-full h-full object-cover rounded-md" />
-                                <button 
-                                    onClick={removeImage}
-                                    className="absolute top-1 right-1 font-bold text-red-500 text-6xl hover:text-red-700 h-12 w-12 rounded-full"
-                                    aria-label="Remove image"
-                                >
-                                    &times;
-                                </button>
-                            </div>
-                        ) : (
-                            <label className="add-image-button flex flex-col items-center text-gray-500 hover:text-gray-700 cursor-pointer">
-                                <FaPhotoVideo className="text-3xl mb-2" />
-                                <span>Insert Image</span>
-                                <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-                            </label>
-                        )}
-                    </div>
-                </div>
-
-                {/* Form Section */}
-                <div className="form-section space-y-6">
-                    {/* Event Name */}
-                    <div>
-                        <label className="block text-lg font-semibold mb-2">Event Name</label>
-                        <input
-                            type="text"
-                            value={eventName}
-                            onChange={(e) => setEventName(e.target.value)}
-                            className="w-full border border-gray-300 rounded-md p-3"
-                            placeholder="Enter event name"
-                        />
-                    </div>
-
-                    {/* Description */}
-                    <div>
-                        <label className="block text-lg font-semibold mb-2">Description</label>
-                        <textarea
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            className="w-full border border-gray-300 rounded-md p-3"
-                            placeholder="Enter event description"
-                            rows="4"
-                        ></textarea>
-                    </div>
-
-                    {/* Date & Time Section */}
-                    <div className="date-time-section space-y-6">
-                        <h3 className="text-lg font-semibold">Date & Time</h3>
-                        
-                        <div className="flex items-start space-x-6">
-                            {/* Date */}
-                            <div className="flex flex-col space-y-2 w-1/2">
-                                <div className="flex items-center space-x-2">
-                                    <div className="flex flex-col w-full">
-                                        <label className="text-sm font-semibold mb-2">Start</label>
-                                        <input 
-                                            type="date" 
-                                            className="border border-gray-300 rounded-md p-2" 
-                                            value={startDate}
-                                            onChange={(e) => setStartDate(e.target.value)}
-                                        />
-                                    </div>
-                                    <span className="text-center mt-5">to</span>
-                                    <div className="flex flex-col w-full">
-                                        <label className="text-sm font-semibold mb-2">End</label>
-                                        <input 
-                                            type="date"
-                                            className="w-full border border-gray-300 rounded-md p-2"
-                                            value={endDate}
-                                            onChange={(e) => setEndDate(e.target.value)}
-                                            min={startDate}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Time */}
-                            <div className="flex flex-col w-1/2 space-y-2">
-                                <label className="text-sm font-semibold">Time</label>
-                                <div className="flex items-center space-x-2">
-                                    <input 
-                                        type="time" 
-                                        className="w-full border border-gray-300 rounded-md p-2"
-                                        value={startTime}
-                                        onChange={(e) => setStartTime(e.target.value)}
-                                    />
-                                    <span>-</span>
-                                    <input 
-                                        type="time"
-                                        className="w-full border border-gray-300 rounded-md p-2"
-                                        value={endTime}
-                                        onChange={(e) => setEndTime(e.target.value)}
-                                        min={startDate === endDate ? startTime : undefined} 
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Location Section */}
-                    <div>
-                        <label className="block text-lg font-semibold mb-2">Location</label>
-                        <input
-                            type="text"
-                            value={locationName}
-                            onChange={(e) => setLocationName(e.target.value)}
-                            className="w-full border border-gray-300 rounded-md p-3 mb-4"
-                            placeholder="Ex: King Mongkut’s University of Technology Thonburi"
-                        />
-                        <input
-                            type="text"
-                            value={locationLink}
-                            onChange={(e) => setLocationLink(e.target.value)}
-                            className="w-full border border-gray-300 rounded-md p-3"
-                            placeholder="Ex: https://maps.app.goo.gl/7GB3bHsdE9ZHWuYG7"
-                        />
-                    </div>
-                </div>
-
-                {/* Create Event Button */}
-                <div className="mt-8 flex justify-center">
-                    <button 
-                        className={`px-8 py-3 rounded-md font-semibold ${isFormComplete ? 'bg-[#508C9B] hover:[#134B70] text-white' : 'bg-[#C0DBEA] text-white cursor-not-allowed'}`}
-                        disabled={!isFormComplete}
-                    >
-                        Create Event
-                    </button>
-                </div>
-            </div>
+  return (
+    <div className="create-event-page flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8 overflow-y-auto">
+      <div className="content-container bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
+        <div className="header-section flex items-center justify-start w-full mb-8 relative">
+          <BackButton onClick={() => navigate("/")} />
+          <h2 className="text-3xl font-bold ml-4">Create Event</h2>
         </div>
-    );
-}
+
+        <div className="image-upload-section flex flex-col items-center mb-8">
+          <div
+            className="image-frame w-full bg-gray-200 rounded-md flex items-center justify-center mb-4 relative"
+            style={{ aspectRatio: "16 / 9" }}
+          >
+            {image ? (
+              <div className="relative w-full h-full">
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt="Uploaded"
+                  className="w-full h-full object-cover rounded-md"
+                />
+                <button
+                  onClick={() => setImage(null)}
+                  className="absolute top-1 right-1 font-bold text-red-500 text-6xl hover:text-red-700 h-12 w-12 rounded-full"
+                  aria-label="Remove image"
+                >
+                  &times;
+                </button>
+              </div>
+            ) : (
+              <label className="add-image-button flex flex-col items-center text-gray-500 hover:text-gray-700 cursor-pointer">
+                <FaPhotoVideo className="text-3xl mb-2" />
+                <span>Insert Image</span>
+                <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+              </label>
+            )}
+          </div>
+        </div>
+
+        <div className="form-section space-y-6">
+          <div>
+            <label className="block text-lg font-semibold mb-2">Event Name</label>
+            <input
+              type="text"
+              name="eventName"
+              value={inputs.eventName}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-md p-3"
+              placeholder="Enter event name"
+            />
+          </div>
+
+          <div>
+            <label className="block text-lg font-semibold mb-2">Description</label>
+            <textarea
+              name="description"
+              value={inputs.description}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-md p-3"
+              placeholder="Enter event description"
+              rows="4"
+            ></textarea>
+          </div>
+
+          <div className="date-time-section space-y-6">
+            <h3 className="text-lg font-semibold">Date & Time</h3>
+            <div className="flex space-x-4">
+              <div className="flex flex-col w-1/2">
+                <label className="text-sm font-semibold">Start Date</label>
+                <input
+                  type="date"
+                  name="start_date"
+                  value={inputs.start_date}
+                  onChange={handleChange}
+                  className="border border-gray-300 rounded-md p-2"
+                />
+              </div>
+              <div className="flex flex-col w-1/2">
+                <label className="text-sm font-semibold">End Date</label>
+                <input
+                  type="date"
+                  name="end_date"
+                  value={inputs.end_date}
+                  onChange={handleChange}
+                  className="border border-gray-300 rounded-md p-2"
+                />
+              </div>
+            </div>
+
+            <div className="flex space-x-4">
+              <div className="flex flex-col w-1/2">
+                <label className="text-sm font-semibold">Start Time</label>
+                <input
+                  type="time"
+                  name="start_time"
+                  value={inputs.start_time}
+                  onChange={handleChange}
+                  className="border border-gray-300 rounded-md p-2"
+                />
+              </div>
+              <div className="flex flex-col w-1/2">
+                <label className="text-sm font-semibold">End Time</label>
+                <input
+                  type="time"
+                  name="end_time"
+                  value={inputs.end_time}
+                  onChange={handleChange}
+                  className="border border-gray-300 rounded-md p-2"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-lg font-semibold mb-2">Location</label>
+            <input
+              type="text"
+              name="locationName"
+              value={inputs.locationName}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-md p-3 mb-4"
+              placeholder="Enter location name"
+            />
+            <input
+              type="text"
+              name="locationLink"
+              value={inputs.locationLink}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-md p-3"
+              placeholder="Enter location link"
+            />
+          </div>
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={handleCreateEvent}
+            className={`px-8 py-3 rounded-md font-semibold ${
+              loading || !inputs.eventName || !inputs.description || !inputs.start_date || !inputs.end_date
+                ? "bg-[#C0DBEA] text-white cursor-not-allowed"
+                : "bg-[#508C9B] text-white hover:bg-[#134B70]"
+            }`}
+            disabled={loading || !inputs.eventName || !inputs.description || !inputs.start_date || !inputs.end_date}
+          >
+            {loading ? "Creating..." : "Create Event"}
+          </button>
+        </div>
+
+        {err && <p className="text-red-500 text-center mt-4">{typeof err === "string" ? err : "An unexpected error occurred."}</p>}
+      </div>
+    </div>
+  );
+};
 
 export default CreateEvent;
