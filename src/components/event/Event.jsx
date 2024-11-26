@@ -36,9 +36,9 @@ export default function Event({ event, isMyEventPage }) {
         </section>
       </Link>
 
-      {/* Join Button */}
-      {!isMyEventPage && (
-        <div className="flex items-center justify-center pb-2 mb-4">
+      {/* Join Button */} 
+      {!isMyEventPage && ( 
+        <div className="flex items-center justify-center pb-2 mb-4"> 
           <button
             onClick={handleJoinClick}
             className={`flex w-[90%] items-center justify-center ${
@@ -50,6 +50,7 @@ export default function Event({ event, isMyEventPage }) {
           </button>
         </div>
       )}
+
     </div>
   );
 }
