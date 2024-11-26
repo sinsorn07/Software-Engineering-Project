@@ -23,6 +23,7 @@
     "@tanstack/react-query-devtools": "^5.61.3",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "leaflet": "^1.9.4",
     "moment": "^2.30.1",

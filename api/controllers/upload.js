@@ -14,16 +14,17 @@ const storage = multer.diskStorage({
 // Initialize Multer with the configured storage
 const upload = multer({ storage });
 
-// Export the upload logic as a route handler
+// Middleware to handle file uploads
+const uploadSingle = upload.single("file");
+
+// Route handler for file upload
 export const uploadFile = (req, res) => {
-  console.log("Incoming file upload request"); // Log to check if the request is received
+  console.log("Incoming file upload request");
 
-  upload.single("file")(req, res, (err) => {
-    console.log("Request Body:", req.body); // Log request body
-    console.log("Uploaded File Metadata:", req.file); // Log file metadata
-
+  // Use the `uploadSingle` middleware to process the file
+  uploadSingle(req, res, (err) => {
     if (err) {
-      console.error("Multer Error:", err); // Log Multer-specific errors
+      console.error("Multer Error:", err);
       return res.status(500).json({ error: "File upload failed", details: err });
     }
 
@@ -32,7 +33,10 @@ export const uploadFile = (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    res.status(200).json({ filename: req.file.filename });
+    // Return full URL of the uploaded file
+    const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    console.log("File uploaded successfully:", fileUrl);
+
+    res.status(200).json({ url: fileUrl });
   });
 };
-

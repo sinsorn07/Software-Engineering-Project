@@ -8,6 +8,7 @@ export const AuthContextProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("user")) || null
   );
 
+  // Function to log in the user
   const login = async (inputs) => {
     try {
       const res = await axios.post(
@@ -24,12 +25,30 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
+  // Function to update the current user data
+  const updateUser = (updatedData) => {
+    setCurrentUser((prevUser) => ({
+      ...prevUser,
+      ...updatedData, // Merge updated data into current user state
+    }));
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        ...currentUser,
+        ...updatedData, // Update localStorage with merged data
+      })
+    );
+  };
+
+  // Synchronize localStorage with current user data
   useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(currentUser));
+    if (currentUser) {
+      localStorage.setItem("user", JSON.stringify(currentUser));
+    }
   }, [currentUser]);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login }}>
+    <AuthContext.Provider value={{ currentUser, login, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

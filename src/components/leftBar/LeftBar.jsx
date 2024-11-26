@@ -1,26 +1,32 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { FaHome, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
-import Meetro from '../../assets/MeetroLogo2.png';
+import { AuthContext } from "../../context/authContext"; // Import AuthContext
+import Meetro from "../../assets/MeetroLogo2.png";
 import LogoutPopup from "../logout/Logout";
 
 export default function LeftBar() {
   const location = useLocation();
-  const navigate = useNavigate();  // Initialize navigate
+  const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext); // Use AuthContext to get currentUser
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
 
   const handleLogoutPopup = () => {
-    setShowLogoutPopup(true); // Fix the spelling error from `ture` to `true`
+    setShowLogoutPopup(true);
   };
 
-  const [profileImage, setProfileImage] = useState(
-    "https://i.pinimg.com/564x/db/46/81/db4681a9b78f6305a8befe28ca02e8cb.jpg"
-  );
-  const [username, setUsername] = useState("ichigo");
+  const handleLogout = () => {
+    // Clear localStorage or session for user logout
+    localStorage.removeItem("user");
+    navigate("/login"); // Redirect to login page
+    setShowLogoutPopup(false); // Close the popup
+  };
 
   const profile = {
-    username: username,
-    avatar: profileImage,
+    username: currentUser?.username || "Unknown User", // Display username from AuthContext
+    avatar:
+      currentUser?.profilePic ||
+      "https://via.placeholder.com/150", // Default avatar if not available
   };
 
   const menus = [
@@ -28,25 +34,15 @@ export default function LeftBar() {
     { to: "/my-event", icon: <FaUserCircle />, label: "My Event" },
   ];
 
-  // Logout function to handle user logout
-  const handleLogout = () => {
-    // Clear session or token here (if applicable)
-    // Example: localStorage.removeItem("token");
-    navigate("/login");  // Redirect to login page after logout
-  };
-
   return (
     <nav className="flex flex-col h-full bg-[#134B70] shadow-md">
       {/* Logo Section */}
       <div className="p-4 border-b border-[#201E43] flex items-center gap-2">
-        {/* Logo Image */}
-        <img 
-          src={Meetro} 
-          alt="Meetro Logo" 
-          className="w-[32px] h-[32px] object-contain" 
+        <img
+          src={Meetro}
+          alt="Meetro Logo"
+          className="w-[32px] h-[32px] object-contain"
         />
-        
-        {/* Logo Text */}
         <Link
           to="/"
           className="text-2xl font-bold text-white hover:text-indigo-200"
@@ -57,9 +53,9 @@ export default function LeftBar() {
 
       {/* Profile Section */}
       <Link
-        to="/profile"
+        to={`/profile/${currentUser?.id}`}
         className={`flex items-center gap-3 p-4 border-b border-[#201E43] transition-all duration-150 ${
-          location.pathname === "/profile"
+          location.pathname.includes("/profile")
             ? "bg-[#201E43] text-white"
             : "text-white hover:bg-[#201E43]"
         }`}
@@ -108,8 +104,8 @@ export default function LeftBar() {
       {showLogoutPopup && (
         <LogoutPopup
           isOpen={showLogoutPopup}
-          onClose={() => setShowLogoutPopup(false)} // Close the popup when Cancel is clicked
-          onLogout={handleLogout}  // Logout when the user confirms
+          onClose={() => setShowLogoutPopup(false)} // Close the popup
+          onLogout={handleLogout} // Handle actual logout
         />
       )}
     </nav>

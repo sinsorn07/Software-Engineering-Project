@@ -1,5 +1,10 @@
 import React, { useState, useContext } from "react";
-import { createBrowserRouter, RouterProvider, Navigate, Outlet } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthContext } from "./context/authContext"; // AuthContext for authentication
 import LeftBar from "./components/leftBar/LeftBar";
@@ -8,7 +13,7 @@ import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import CreatePost from "./pages/createPost/CreatePost";
 import CreateEvent from "./pages/createEvent/CreateEvent";
-import EventDetail from "./pages/eventDetail/EventDetail";
+import EventDetail from "./pages/eventDetail/eventDetail";
 import EditEvent from "./pages/editEvent/EditEvent";
 import EditProfile from "./pages/editProfile/EditProfile";
 import MyEvent from "./pages/myEvent/MyEvent";
@@ -29,8 +34,11 @@ function App() {
           <div className="flex w-full">
             {/* LeftBar fixed to the left side */}
             <div className="fixed left-0 top-0 h-full w-60 z-50">
-              <LeftBar handleLogoutPopup={() => setShowLogoutPopup(true)} />
+            <LeftBar
+              key={currentUser?.username || currentUser?.profilePic || "default"}
+              handleLogoutPopup={() => setShowLogoutPopup(true)}/>
             </div>
+
 
             {/* Main Content area */}
             <div className="ml-60 w-full flex flex-col overflow-auto z-0">
@@ -67,8 +75,8 @@ function App() {
       ),
       children: [
         { path: "/", element: <Home /> },
-        { path: "/profile", element: <Profile /> },
-        { path: "/edit-profile", element: <EditProfile /> },
+        { path: "/profile/:userId", element: <Profile /> }, // Updated route
+        { path: "/edit-profile/:userId", element: <EditProfile /> },
         { path: "/create-event", element: <CreateEvent /> },
         { path: "/edit-event/:id", element: <EditEvent /> },
         { path: "/event/:id", element: <EventDetail /> },
