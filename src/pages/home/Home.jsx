@@ -108,7 +108,7 @@ export default function Home() {
               >
                 <div className="flex flex-col gap-2">
                   <img
-                    src={event.img}
+                    src={`http://localhost:8800/uploads/${event.img}`}
                     alt={event.eventName}
                     className="h-48 w-full rounded-lg object-cover"
                   />

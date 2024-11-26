@@ -34,42 +34,55 @@ const CreateEvent = () => {
 
   const handleCreateEvent = async (e) => {
     e.preventDefault();
-  
+
     // Ensure required fields are filled
-    if (!inputs.eventName || !inputs.description || !inputs.startDate || !inputs.endDate || !inputs.locationName || !inputs.locationLink) {
+    if (!inputs.eventName || !inputs.description || !inputs.start_date || !inputs.end_date || !inputs.locationName || !inputs.locationLink) {
       setErr("Required fields are missing!");
       return;
     }
-  
+
     setLoading(true);
     setErr(null);
-  
+
     try {
-      // Create a FormData object
-      const formData = new FormData();
-      formData.append("eventName", inputs.eventName);
-      formData.append("description", inputs.description);
-      formData.append("location_name", inputs.locationName);
-      formData.append("link", inputs.locationLink);
-      formData.append("start_date", inputs.startDate);
-      formData.append("end_date", inputs.endDate);
-      formData.append("start_time", inputs.startTime || "00:00");
-      formData.append("end_time", inputs.endTime || "00:00");
-  
+      let uploadedFilename = null;
+
+      // Upload the image first if it exists
       if (image) {
+        const formData = new FormData();
         formData.append("file", image);
+
+        const uploadResponse = await axios.post("http://localhost:8800/api/uploads/file", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true, // Include cookies for authentication
+        });
+
+        uploadedFilename = uploadResponse.data.filename;
       }
-  
-      // Send POST request to the backend
-      await axios.post("http://localhost:8800/api/events", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true, // Include cookies for authentication
+
+      // Prepare event data
+      const eventPayload = {
+        eventName: inputs.eventName,
+        description: inputs.description,
+        location_name: inputs.locationName,
+        link: inputs.locationLink,
+        start_date: inputs.start_date,
+        end_date: inputs.end_date,
+        start_time: inputs.start_time || "00:00",
+        end_time: inputs.end_time || "00:00",
+        img: uploadedFilename, // Include the uploaded image filename
+      };
+
+      // Create the event
+      await axios.post("http://localhost:8800/api/events", eventPayload, {
+        withCredentials: true,
       });
-  
+
       navigate("/"); // Redirect to home on success
     } catch (error) {
+      console.error(error);
       setErr(error.response?.data || "An error occurred while creating the event.");
     } finally {
       setLoading(false);
