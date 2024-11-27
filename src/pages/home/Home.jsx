@@ -9,8 +9,8 @@ import { AuthContext } from "../../context/authContext";
 export default function Home() {
   // Fetch events from the backend
   const { isLoading, error, data } = useQuery({
-    queryKey: ["events"],
-    queryFn: () => makeRequest.get("/events").then((res) => res.data),
+    queryKey: ["event"],
+    queryFn: () => makeRequest.get("/event").then((res) => res.data),
   });
 
   const { currentUser } = useContext(AuthContext); // Access the current user from AuthContext
@@ -19,7 +19,7 @@ export default function Home() {
   // State for search and filter
   const [filter, setFilter] = useState("latest");
   const [searchText, setSearchText] = useState("");
-  const [events, setEvents] = useState([]);
+  const [event, setEvents] = useState([]);
 
   // Populate events when data is fetched from backend
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function Home() {
   }, [data]);
 
   // Filtering Logic
-  const filteredEvents = events.filter((event) => {
+  const filteredEvents = event.filter((event) => {
     if (filter === "latest") {
       return true; // Default: Show all events
     } else if (filter === "hit") {
@@ -139,6 +139,7 @@ export default function Home() {
               <Event
                 key={index}
                 event={{
+                  id: event.id,
                   eventName: event.eventName,
                   description: event.description,
                   locationName: event.location_name,
