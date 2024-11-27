@@ -15,11 +15,12 @@ const verifyToken = (req, res, next) => {
 // Get all events (Home Page)
 export const getAllEvents = (req, res) => {
   const q = `
-    SELECT e.*, u.name AS creatorName, l.location_name, l.link
+    SELECT e.*, u.name AS creatorName, l.location_name, l.link,
+           (SELECT COUNT(*) FROM participants WHERE eventId = e.id) AS participantCount
     FROM events AS e
     JOIN users AS u ON u.id = e.creator
     LEFT JOIN location AS l ON l.eventId = e.id
-    ORDER BY e.start_date DESC
+    ORDER BY participantCount DESC, e.start_date DESC
   `;
   db.query(q, (err, data) => {
     if (err) return res.status(500).json(err);
@@ -27,22 +28,86 @@ export const getAllEvents = (req, res) => {
   });
 };
 
-// Get events joined by the user (MyEvent Page)
+//get all joined events (My event)
+
 export const getUserEvents = [verifyToken, (req, res) => {
-  const q = `
-    SELECT e.*, u.name AS creatorName, l.location_name, l.link
+  const { selectedDate } = req.query;
+
+  // Validate selectedDate format
+  if (selectedDate && !/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
+    return res.status(400).json("Invalid date format.");
+  }
+
+  // Base query
+  let q = `
+    SELECT e.*, u.name AS creatorName, l.location_name, l.link,
+           (SELECT COUNT(*) FROM participants WHERE eventId = e.id) AS participantCount
     FROM events AS e
     JOIN users AS u ON u.id = e.creator
     JOIN participants AS p ON p.eventId = e.id
     LEFT JOIN location AS l ON l.eventId = e.id
     WHERE p.userId = ?
-    ORDER BY e.start_date DESC
   `;
-  db.query(q, [req.userInfo.id], (err, data) => {
+
+  const values = [req.userInfo.id];
+
+  // Add date filter if selectedDate is provided
+  if (selectedDate) {
+    q += ` AND ? BETWEEN DATE(e.start_date) AND DATE(e.end_date)`;
+    values.push(selectedDate);
+  }
+  q += ` ORDER BY participantCount DESC, e.start_date DESC`;
+
+
+  db.query(q, values, (err, data) => {
     if (err) return res.status(500).json(err);
-    return res.status(200).json(data); // Send events joined by the user
+
+    // If no events, return empty array with consistent format
+    if (!data || data.length === 0) {
+      console.log("No events available for the user.");
+      return res.status(200).json([]);
+    }
+
+    // Helper function to convert UTC to Thailand time
+    const convertToThailandTime = (utcDate) => {
+      const date = new Date(utcDate);
+      const thailandTimeOffset = 7 * 60 * 60 * 1000; // UTC+7 offset in milliseconds
+      return new Date(date.getTime() + thailandTimeOffset);
+    };
+
+    // Generate date ranges including the last day, in Thailand time
+    const expandedEvents = data.map((event) => {
+      const startDate = convertToThailandTime(event.start_date);
+      const endDate = convertToThailandTime(event.end_date);
+
+      if (isNaN(startDate) || isNaN(endDate)) {
+        console.error("Invalid date for event:", event);
+        return { ...event, dateRange: [] };
+      }
+
+      // Calculate the date range (Thailand time)
+      const dateRange = [];
+      for (
+        let d = new Date(startDate);
+        d <= new Date(new Date(endDate).setDate(new Date(endDate).getDate())); 
+        d.setDate(d.getDate() + 1)
+      ) {
+        dateRange.push(d.toISOString().split("T")[0]); // Format as YYYY-MM-DD
+      }
+
+      return {
+        ...event,
+        start_date: startDate.toISOString(), // Return Thailand start_date
+        end_date: endDate.toISOString(),     // Return Thailand end_date
+        dateRange,
+      };
+    });
+
+    console.log("Expanded events with date ranges (Thailand time):", expandedEvents);
+    return res.status(200).json(expandedEvents);
   });
 }];
+
 
 // Add a new event
 export const addEvent = [verifyToken, (req, res) => {
