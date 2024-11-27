@@ -38,7 +38,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/likes", likeRoutes);
-app.use("/api/events", eventRoutes);
+app.use("/api/event", eventRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/uploads", uploadRoutes);
 

@@ -59,7 +59,15 @@ export const login = (req, res) => {
       .json(others);
   });
 };
+export const getCurrentUser = (req, res) => {
+  const token = req.cookies.accessToken; // get token from cookies
+  if (!token) return res.status(401).json("Not logged in!");
 
+  jwt.verify(token, "secretkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+    res.status(200).json(userInfo); // return user info
+  });
+};
 
 export const logout = (req, res) => {
   res.clearCookie("accessToken",{

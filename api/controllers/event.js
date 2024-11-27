@@ -108,6 +108,18 @@ export const getUserEvents = [verifyToken, (req, res) => {
   });
 }];
 
+// Fetch event details by ID
+export const getEventById = (req, res) => {
+  const eventId = req.params.eventId; // Get event ID from URL parameter
+  const q = "SELECT * FROM events WHERE id = ?"; // Query to fetch event details
+
+  db.query(q, [eventId], (err, data) => {
+    if (err) return res.status(500).json(err); // Handle database errors
+    if (data.length === 0) return res.status(404).json("Event not found!"); // Handle event not found
+    return res.status(200).json(data[0]); // Return event details
+  });
+};
+
 
 // Add a new event
 export const addEvent = [verifyToken, (req, res) => {
@@ -200,7 +212,7 @@ export const editEvent = [verifyToken, (req, res) => {
     start_time,
     end_time,
     img || null,
-    req.params.id,  // Event ID
+    req.params.eventId,  // Event ID
     req.userInfo.id // Logged-in user must be the creator
   ];
 
@@ -215,7 +227,7 @@ export const editEvent = [verifyToken, (req, res) => {
           SET location_name = ?, link = ? 
           WHERE eventId = ?
         `;
-        const locationUpdateValues = [location_name, link, req.params.id];
+        const locationUpdateValues = [location_name, link, req.params.eventId];
 
         db.query(locationUpdateQuery, locationUpdateValues, (err) => {
           if (err) return res.status(500).json({ error: "Event updated, but location update failed", details: err });
@@ -232,7 +244,7 @@ export const editEvent = [verifyToken, (req, res) => {
 
 // Delete an event
 export const deleteEvent = [verifyToken, (req, res) => {
-  const eventId = req.params.id; // Event ID from the route parameter
+  const eventId = req.params.eventId; // Event ID from the route parameter
 
   // Query to check if the event exists and if the current user is the creator
   const qCheck = `
