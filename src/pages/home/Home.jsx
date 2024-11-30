@@ -13,6 +13,16 @@ export default function Home() {
     queryFn: () => makeRequest.get("/event").then((res) => res.data),
   });
 
+  const { isLoading: participantLoading, error: participantError, data: participantsData } = useQuery({
+    queryKey: ["participants"], // Keep the query key as before
+    queryFn: () =>
+      makeRequest.get("/participant/findAll") // Call the backend API endpoint
+        .then((res) => res.data), // Extract data from the response
+  });
+
+  // console.log("isLoading Var:", isLoading);
+  // console.log("error Var:", error);
+  // console.log("data Var:", data);
   const { currentUser } = useContext(AuthContext); // Access the current user from AuthContext
   const navigate = useNavigate();
 
@@ -79,6 +89,8 @@ export default function Home() {
       alert("An error occurred while trying to join the event.");
     }
   };
+
+
 
   // Navigate to event detail page
   const handleEventDetail = (eventId) => {

@@ -18,7 +18,7 @@ export default function MyEvent() {
   const { isLoading, error, data } = useQuery({
     queryKey: ["userEvents"],
     queryFn: () =>
-      makeRequest.get("/events/user").then((res) =>
+      makeRequest.get("/event/user").then((res) =>
         res.data.map((event) => ({
           title: event.eventName,
           start: event.start_date,

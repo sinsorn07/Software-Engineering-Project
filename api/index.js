@@ -9,6 +9,7 @@ import eventRoutes from "./routes/events.js";
 import likeRoutes from "./routes/likes.js";
 import chatRoutes from './routes/Chats.js';
 import uploadRoutes from "./routes/Uploads.js";
+import participantRoutes from './routes/participants.js';
 import socketHandler from "./socket.js"; // Import socket.js
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -27,6 +28,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(cookieParser());
 
 // Serve static files for media uploads
@@ -41,6 +43,7 @@ app.use("/api/likes", likeRoutes);
 app.use("/api/event", eventRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/uploads", uploadRoutes);
+app.use('/api/participant', participantRoutes);
 
 // WebSocket handling (delegated to socket.js)
 socketHandler(server);

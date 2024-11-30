@@ -15,7 +15,7 @@ const verifyToken = (req, res, next) => {
 // Get all events (Home Page)
 export const getAllEvents = (req, res) => {
   const q = `
-    SELECT e.*, u.name AS creatorName, l.location_name, l.link,
+    SELECT e.*, u.name AS creatorName, l.locationName, l.link,
            (SELECT COUNT(*) FROM participants WHERE eventId = e.id) AS participantCount
     FROM events AS e
     JOIN users AS u ON u.id = e.creator
@@ -40,7 +40,7 @@ export const getUserEvents = [verifyToken, (req, res) => {
 
   // Base query
   let q = `
-    SELECT e.*, u.name AS creatorName, l.location_name, l.link,
+    SELECT e.*, u.name AS creatorName, l.locationName, l.link,
            (SELECT COUNT(*) FROM participants WHERE eventId = e.id) AS participantCount
     FROM events AS e
     JOIN users AS u ON u.id = e.creator
