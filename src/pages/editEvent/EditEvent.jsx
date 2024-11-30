@@ -31,14 +31,14 @@ const EditEvent = () => {
     useEffect(() => {
         const fetchEventDetails = async () => {
             try {
-                const res = await axios.get(`http://localhost:8800/api/events/${id}`, {
+                const res = await axios.get(`http://localhost:8800/api/event/${id}`, {
                     withCredentials: true,
                 });
                 const event = res.data;
                 setInputs({
                     eventName: event.eventName,
                     description: event.description,
-                    locationName: event.location_name,
+                    locationName: event.locationName,
                     locationLink: event.link,
                     startDate: event.start_date,
                     endDate: event.end_date,
@@ -105,7 +105,7 @@ const EditEvent = () => {
             const editEvent = {
                 eventName: inputs.eventName,
                 description: inputs.description,
-                location_name: inputs.locationName,
+                locationName: inputs.locationName,
                 link: inputs.locationLink,
                 start_date: inputs.startDate,
                 end_date: inputs.endDate,
@@ -114,7 +114,7 @@ const EditEvent = () => {
                 img: uploadedFileUrl,
             };
 
-            await axios.put(`http://localhost:8800/api/events/${id}`, editEvent, {
+            await axios.put(`http://localhost:8800/api/event/${id}`, editEvent, {
                 withCredentials: true,
             });
 

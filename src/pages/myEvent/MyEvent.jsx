@@ -171,7 +171,7 @@ export default function MyEvent() {
                 event={{
                   eventName: event.title,
                   description: event.extendedProps.description,
-                  locationName: event.extendedProps.location_name,
+                  locationName: event.extendedProps.locationName,
                   startDate: formatDate(event.start),
                   endDate: formatDate(event.end),
                   image: event.extendedProps.img,

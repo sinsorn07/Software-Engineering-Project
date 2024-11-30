@@ -66,7 +66,7 @@ export default function Home() {
 
     try {
       const response = await makeRequest.post(
-        `/events/join`,
+        `/event/join`,
         { eventId }, // Pass event ID as payload
         { withCredentials: true }
       );
@@ -154,7 +154,7 @@ export default function Home() {
                   id: event.id,
                   eventName: event.eventName,
                   description: event.description,
-                  locationName: event.location_name,
+                  locationName: event.locationName,
                   startDate: formatDate(event.start_date),
                   endDate: formatDate(event.end_date),
                   image: event.img,
@@ -176,7 +176,7 @@ export default function Home() {
                   </p>
                   <p className="text-sm text-gray-500">
                     <span className="text-[#508C9B] font-semibold">
-                      {event.location_name || "Location not provided"}
+                      {event.locationName || "Location not provided"}
                     </span>
                   </p>
                 </div>

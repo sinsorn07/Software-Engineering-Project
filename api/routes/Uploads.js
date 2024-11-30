@@ -6,6 +6,6 @@ const router = express.Router();
 
 // Define the upload route
 router.post("/file", uploadFile);
-router.post("/events", addEvent);
+router.post("/event", addEvent);
 
 export default router;

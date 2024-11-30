@@ -123,10 +123,10 @@ export const getEventById = (req, res) => {
 
 // Add a new event
 export const addEvent = [verifyToken, (req, res) => {
-  const { eventName, description, start_date, end_date, start_time, end_time, img, location_name, link } = req.body;
+  const { eventName, description, start_date, end_date, start_time, end_time, img, locationName, link } = req.body;
 
   // Validation for required fields
-  // if (!eventName || !start_date || !end_date || !location_name || !link) {
+  // if (!eventName || !start_date || !end_date || !locationName || !link) {
   //   return res.status(400).json("Required fields are missing!");
   // }
 
@@ -169,11 +169,11 @@ export const addEvent = [verifyToken, (req, res) => {
 
       // Insert into location table
       const q = `
-        INSERT INTO location(location_name, link, eventId)
+        INSERT INTO location(locationName, link, eventId)
         VALUES (?, ?, ?)
       `;
 
-      const values = [location_name, link, eventId];
+      const values = [locationName, link, eventId];
 
       db.query(q, values, (err, locationResult) => {
         if (err) return res.status(500).json(err);
@@ -190,7 +190,7 @@ export const addEvent = [verifyToken, (req, res) => {
 
 // Edit an event
 export const editEvent = [verifyToken, (req, res) => {
-  const { eventName, description, start_date, end_date, start_time, end_time, img, location_name, link } = req.body;
+  const { eventName, description, start_date, end_date, start_time, end_time, img, locationName, link } = req.body;
 
   // Validation for required fields
   if (!eventName || !start_date || !end_date) {
@@ -221,13 +221,13 @@ export const editEvent = [verifyToken, (req, res) => {
 
     if (data.affectedRows > 0) {
       // If location details are provided, update them in the location table
-      if (location_name && link) {
+      if (locationName && link) {
         const locationUpdateQuery = `
           UPDATE location 
-          SET location_name = ?, link = ? 
+          SET locationName = ?, link = ? 
           WHERE eventId = ?
         `;
-        const locationUpdateValues = [location_name, link, req.params.eventId];
+        const locationUpdateValues = [locationName, link, req.params.eventId];
 
         db.query(locationUpdateQuery, locationUpdateValues, (err) => {
           if (err) return res.status(500).json({ error: "Event updated, but location update failed", details: err });

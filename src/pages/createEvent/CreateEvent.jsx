@@ -67,7 +67,7 @@ const CreateEvent = () => {
       const eventPayload = {
         eventName: inputs.eventName,
         description: inputs.description,
-        location_name: inputs.locationName,
+        locationName: inputs.locationName,
         link: inputs.locationLink,
         start_date: inputs.start_date,
         end_date: inputs.end_date,
@@ -77,7 +77,7 @@ const CreateEvent = () => {
       };
     
       // Create the event
-      await axios.post("http://localhost:8800/api/events", eventPayload, {
+      await axios.post("http://localhost:8800/api/event", eventPayload, {
         withCredentials: true,
       });
     
