@@ -22,14 +22,3 @@ export const getAllParticipantWithNoCondition = (req, res) => {
       return res.status(200).json(data);  // Return the participant data to the client
     });
   };
-
-// add participant to event
-export const addParticipanttoEvent = (req, res) => {
-    const q = `
-      SELECT * FROM meetro.participants;
-    `;
-    db.query(q, (err, data) => {
-      if (err) return res.status(500).json(err);  // Handle any errors during the query
-      return res.status(200).json(data);  // Return the participant data to the client
-    });
-  };

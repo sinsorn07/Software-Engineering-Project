@@ -1,3 +1,198 @@
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { FaEllipsisV, FaPen, FaCommentDots } from "react-icons/fa";
+import { makeRequest } from "../../axios";
+import MapComponent from "../../components/map/MapComponent";
+import BackButton from "../../components/backbutton/BackButton";
+import LeaveEvent from "../../components/leaveEvent/LeaveEvent";
+import DeleteEvent from "../../components/deleteEvent/DeleteEvent";
+
+const EventDetail = () => {
+  const { eventId } = useParams(); // Get the event ID from the route
+  const [event, setEvent] = useState(null); // State to store event details
+  const [currentUser, setCurrentUser] = useState(null); // State to store current user info
+  const [showOptions, setShowOptions] = useState(false); // Toggle options dropdown visibility
+  const [isLeavePopupOpen, setIsLeavePopupOpen] = useState(false); // Toggle leave event popup
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false); // Toggle delete event popup
+  const navigate = useNavigate(); // Navigation handler
+  const optionsRef = useRef(null); // Reference for options dropdown
+  const buttonRef = useRef(null); // Reference for options button
+
+  // Fetch current user data
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+        try {
+          const response = await makeRequest.get("/auth/current-user");
+          setCurrentUser(response.data); // Set current user data
+        } catch (err) {
+          console.error("Failed to fetch current user:", err);
+          navigate("/login"); // Redirect to login if user is not authenticated
+        }
+      };
+      
+
+    fetchCurrentUser();
+  }, [navigate]);
+  
+  
+
+  // Fetch event details based on event ID
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+      try {
+        console.log("Fetching event details for eventId:", eventId); 
+        const response = await makeRequest.get(`/event/${eventId}`);
+        console.log("Fetched event data:", response.data); 
+        setEvent(response.data); 
+      } catch (err) {
+        console.error("Failed to fetch event details:", err); 
+        navigate("/"); 
+      }
+    };
+  
+    fetchEventDetails();
+  }, [eventId, navigate]);
+  
+  
+
+  // Determine if the current user is the creator of the event
+  const userRole = event?.eventCreator === currentUser?.username ? "creator" : "participant";
+
+  // Toggle options dropdown visibility
+  const toggleOptions = () => setShowOptions(!showOptions);
+
+  // Handle navigation to edit event page
+  const handleEditEvent = () => navigate(`/edit-event/${id}`);
+
+  // Handle joining an event
+  const handleJoinEvent = async () => {
+    try {
+      await axios.post("/api/event/join", { eventId: id });
+      console.log("Successfully joined the event!");
+      // Optionally refetch the event data to update participants
+    } catch (err) {
+      console.error("Failed to join the event:", err);
+    }
+  };
+
+  // Handle leaving an event
+  const handleLeaveEvent = async () => {
+    try {
+      await axios.post("/api/event/leave", { eventId: id });
+      console.log("Successfully left the event!");
+      setIsLeavePopupOpen(false); // Close the leave event popup
+    } catch (err) {
+      console.error("Failed to leave the event:", err);
+    }
+  };
+
+  // Handle deleting an event
+  const handleDeleteEvent = async () => {
+    try {
+      await axios.delete(`/api/event/${id}`);
+      console.log("Event deleted successfully!");
+      setIsDeletePopupOpen(false); // Close the delete event popup
+      navigate("/"); // Redirect to home page
+    } catch (err) {
+      console.error("Failed to delete the event:", err);
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        optionsRef.current &&
+        !optionsRef.current.contains(event.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target)
+      ) {
+        setShowOptions(false); // Close dropdown if clicking outside
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Return loading indicator while fetching data
+  if (!event || !currentUser) return <div>Loading...</div>;
+
+  return (
+    <div className="event-detail-page flex flex-col items-center justify-start min-h-screen bg-gray-100 p-8">
+      {/* Top section */}
+      <div className="top-section bg-white rounded-lg shadow-md w-full max-w-3xl p-6">
+        <div className="flex items-center justify-between">
+          <BackButton onClick={() => navigate("/")} />
+          <h1 className="text-2xl font-bold">{event.eventName}</h1>
+          <div className="relative">
+            <button
+              ref={buttonRef}
+              onClick={toggleOptions}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              <FaEllipsisV />
+            </button>
+            {showOptions && (
+              <div
+                ref={optionsRef}
+                className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg border"
+              >
+                {userRole === "creator" ? (
+                  <>
+                    <button
+                      onClick={handleEditEvent}
+                      className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                    >
+                      Edit Event
+                    </button>
+                    <button
+                      onClick={() => setIsDeletePopupOpen(true)}
+                      className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                    >
+                      Delete Event
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setIsLeavePopupOpen(true)}
+                    className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                  >
+                    Leave Event
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+        <p className="text-gray-600">{event.description}</p>
+        <p>
+          {event.startDate} - {event.endDate}, {event.startTime} - {event.endTime}
+        </p>
+      </div>
+
+      {/* Leave event popup */}
+      <LeaveEvent
+        isOpen={isLeavePopupOpen}
+        onClose={() => setIsLeavePopupOpen(false)}
+        onLeave={handleLeaveEvent}
+      />
+
+      {/* Delete event popup */}
+      <DeleteEvent
+        isOpen={isDeletePopupOpen}
+        onClose={() => setIsDeletePopupOpen(false)}
+        onDelete={handleDeleteEvent}
+      />
+    </div>
+  );
+};
+
+export default EventDetail;
+
+
+
+
 // import React, { useState, useEffect, useRef } from 'react';
 // import { useParams } from 'react-router-dom';
 // import { FaArrowLeft, FaEllipsisV, FaPen, FaCommentDots, FaArrowUp } from 'react-icons/fa';
@@ -407,194 +602,3 @@
 
 // export default EventDetail;
 
-import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { FaEllipsisV, FaPen, FaCommentDots } from "react-icons/fa";
-import { makeRequest } from "../../axios";
-import MapComponent from "../../components/map/MapComponent";
-import BackButton from "../../components/backbutton/BackButton";
-import LeaveEvent from "../../components/leaveEvent/LeaveEvent";
-import DeleteEvent from "../../components/deleteEvent/DeleteEvent";
-
-const EventDetail = () => {
-  const { eventId } = useParams(); // Get the event ID from the route
-  const [event, setEvent] = useState(null); // State to store event details
-  const [currentUser, setCurrentUser] = useState(null); // State to store current user info
-  const [showOptions, setShowOptions] = useState(false); // Toggle options dropdown visibility
-  const [isLeavePopupOpen, setIsLeavePopupOpen] = useState(false); // Toggle leave event popup
-  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false); // Toggle delete event popup
-  const navigate = useNavigate(); // Navigation handler
-  const optionsRef = useRef(null); // Reference for options dropdown
-  const buttonRef = useRef(null); // Reference for options button
-
-  // Fetch current user data
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-        try {
-          const response = await makeRequest.get("/auth/current-user");
-          setCurrentUser(response.data); // Set current user data
-        } catch (err) {
-          console.error("Failed to fetch current user:", err);
-          navigate("/login"); // Redirect to login if user is not authenticated
-        }
-      };
-      
-
-    fetchCurrentUser();
-  }, [navigate]);
-  
-  
-
-  // Fetch event details based on event ID
-  useEffect(() => {
-    const fetchEventDetails = async () => {
-      try {
-        console.log("Fetching event details for eventId:", eventId); 
-        const response = await makeRequest.get(`/event/${eventId}`);
-        console.log("Fetched event data:", response.data); 
-        setEvent(response.data); 
-      } catch (err) {
-        console.error("Failed to fetch event details:", err); 
-        navigate("/"); 
-      }
-    };
-  
-    fetchEventDetails();
-  }, [eventId, navigate]);
-  
-  
-
-  // Determine if the current user is the creator of the event
-  const userRole = event?.eventCreator === currentUser?.username ? "creator" : "participant";
-
-  // Toggle options dropdown visibility
-  const toggleOptions = () => setShowOptions(!showOptions);
-
-  // Handle navigation to edit event page
-  const handleEditEvent = () => navigate(`/edit-event/${id}`);
-
-  // Handle joining an event
-  const handleJoinEvent = async () => {
-    try {
-      await axios.post("/api/event/join", { eventId: id });
-      console.log("Successfully joined the event!");
-      // Optionally refetch the event data to update participants
-    } catch (err) {
-      console.error("Failed to join the event:", err);
-    }
-  };
-
-  // Handle leaving an event
-  const handleLeaveEvent = async () => {
-    try {
-      await axios.post("/api/event/leave", { eventId: id });
-      console.log("Successfully left the event!");
-      setIsLeavePopupOpen(false); // Close the leave event popup
-    } catch (err) {
-      console.error("Failed to leave the event:", err);
-    }
-  };
-
-  // Handle deleting an event
-  const handleDeleteEvent = async () => {
-    try {
-      await axios.delete(`/api/event/${id}`);
-      console.log("Event deleted successfully!");
-      setIsDeletePopupOpen(false); // Close the delete event popup
-      navigate("/"); // Redirect to home page
-    } catch (err) {
-      console.error("Failed to delete the event:", err);
-    }
-  };
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        optionsRef.current &&
-        !optionsRef.current.contains(event.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target)
-      ) {
-        setShowOptions(false); // Close dropdown if clicking outside
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Return loading indicator while fetching data
-  if (!event || !currentUser) return <div>Loading...</div>;
-
-  return (
-    <div className="event-detail-page flex flex-col items-center justify-start min-h-screen bg-gray-100 p-8">
-      {/* Top section */}
-      <div className="top-section bg-white rounded-lg shadow-md w-full max-w-3xl p-6">
-        <div className="flex items-center justify-between">
-          <BackButton onClick={() => navigate("/")} />
-          <h1 className="text-2xl font-bold">{event.eventName}</h1>
-          <div className="relative">
-            <button
-              ref={buttonRef}
-              onClick={toggleOptions}
-              className="text-gray-600 hover:text-gray-800"
-            >
-              <FaEllipsisV />
-            </button>
-            {showOptions && (
-              <div
-                ref={optionsRef}
-                className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg border"
-              >
-                {userRole === "creator" ? (
-                  <>
-                    <button
-                      onClick={handleEditEvent}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                    >
-                      Edit Event
-                    </button>
-                    <button
-                      onClick={() => setIsDeletePopupOpen(true)}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                    >
-                      Delete Event
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={() => setIsLeavePopupOpen(true)}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                  >
-                    Leave Event
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-        <p className="text-gray-600">{event.description}</p>
-        <p>
-          {event.startDate} - {event.endDate}, {event.startTime} - {event.endTime}
-        </p>
-      </div>
-
-      {/* Leave event popup */}
-      <LeaveEvent
-        isOpen={isLeavePopupOpen}
-        onClose={() => setIsLeavePopupOpen(false)}
-        onLeave={handleLeaveEvent}
-      />
-
-      {/* Delete event popup */}
-      <DeleteEvent
-        isOpen={isDeletePopupOpen}
-        onClose={() => setIsDeletePopupOpen(false)}
-        onDelete={handleDeleteEvent}
-      />
-    </div>
-  );
-};
-
-export default EventDetail;
