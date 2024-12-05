@@ -21,6 +21,11 @@ const CreateEvent = () => {
 
   const navigate = useNavigate();
 
+  const validateUrl = (url) => {
+    const urlRegex = /^(https?:\/\/)?(www\.)?([a-zA-Z0-9_-]+)\.([a-zA-Z]{2,})(\/[a-zA-Z0-9#_-]+)*\/?$/;
+    return urlRegex.test(url);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInputs((prev) => ({ ...prev, [name]: value }));
@@ -38,6 +43,12 @@ const CreateEvent = () => {
     // Ensure required fields are filled
     if (!inputs.eventName || !inputs.description || !inputs.start_date || !inputs.end_date || !inputs.locationName || !inputs.locationLink) {
       setErr("Required fields are missing!");
+      return;
+    }
+
+    // Validate locationLink
+    if (!validateUrl(inputs.locationLink)) {
+      setErr("Please enter a valid URL for the location link!");
       return;
     }
 

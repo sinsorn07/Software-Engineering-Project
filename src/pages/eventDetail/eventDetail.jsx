@@ -235,7 +235,7 @@ const EventDetail = () => {
           {/* Creator information */}
           {event.creatorName && (
             <div className="flex items-center text-black-600 mb-4" 
-            onClick={() => handleNavigateToProfile(event.CreatorId)}>
+            onClick={() => handleNavigateToProfile(event.creator)}>
               <strong className="mr-2">Event Creator:</strong>
               <img
                 src={event.creatorProfilePic}

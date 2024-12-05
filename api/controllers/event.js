@@ -113,11 +113,21 @@ export const getUserEvents = [verifyToken, (req, res) => {
 export const getEventById = (req, res) => {
   const eventId = req.params.eventId; // Get event ID from URL parameter
   const q = `
-    SELECT e.*, l.locationName, l.link
-    FROM events AS e
-    LEFT JOIN location AS l ON e.id = l.eventId
-    WHERE e.id = ?
-  `; // Query to fetch event details
+  SELECT 
+    e.*, 
+    u.username AS creatorName, 
+    u.profilePic AS creatorProfilePic, 
+    l.locationName, 
+    l.link AS locationLink
+  FROM 
+    events AS e
+  LEFT JOIN
+    users AS u ON e.creator = u.id
+  LEFT JOIN 
+    location AS l ON e.id = l.eventId
+  WHERE 
+    e.id = ?;
+`;
 
   db.query(q, [eventId], (err, data) => {
     if (err) return res.status(500).json(err); // Handle database errors
