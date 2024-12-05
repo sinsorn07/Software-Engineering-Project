@@ -90,7 +90,7 @@ export const getUserEvents = [verifyToken, (req, res) => {
       const dateRange = [];
       for (
         let d = new Date(startDate);
-        d <= new Date(new Date(endDate).setDate(new Date(endDate).getDate()));
+        d <= new Date(new Date(endDate).setDate(new Date(endDate).getDate())); 
         d.setDate(d.getDate() + 1)
       ) {
         dateRange.push(d.toISOString().split("T")[0]); // Format as YYYY-MM-DD
@@ -230,6 +230,7 @@ export const editEvent = [verifyToken, (req, res) => {
           SET locationName = ?, link = ? 
           WHERE eventId = ?
         `;
+
         const locationUpdateValues = [locationName, link, eventId];
 
         db.query(locationUpdateQuery, locationUpdateValues, (err) => {

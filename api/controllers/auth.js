@@ -15,13 +15,15 @@ export const register = (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(req.body.password, salt);
 
-    const q = "INSERT INTO users (`username`,`email`,`password`,`name`) VALUE (?)";
+    const q = "INSERT INTO users (`username`,`email`,`password`,`name`,`profilePic`, `coverPic`) VALUE (?)";
 
     const values = [
       req.body.username,
       req.body.email,
       hashedPassword,
       req.body.name,
+      'https://i.postimg.cc/nzJJzdBt/default-avatar-profile-icon.jpg', //default profile image
+      'https://i.postimg.cc/K8YP1SSP/1.jpg', //default cover image
     ];
 
     db.query(q, [values], (err, data) => {

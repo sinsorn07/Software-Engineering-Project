@@ -85,6 +85,7 @@ export default function Event({ event, isMyEventPage }) {
 
         </div>
       )}
+
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { makeRequest } from "../../axios";
 import FullCalendar from "@fullcalendar/react"; // FullCalendar React component
 import dayGridPlugin from "@fullcalendar/daygrid"; // FullCalendar day grid plugin
 import interactionPlugin from "@fullcalendar/interaction"; // To handle user interactions
+import { useNavigate } from 'react-router-dom';
 
 export default function MyEvent() {
   const [selectedDate, setSelectedDate] = useState(null); // Selected date
@@ -92,6 +93,13 @@ export default function MyEvent() {
     return new Date(date).toLocaleDateString(undefined, options);
   };
 
+  const navigate = useNavigate();
+
+  // Navigate to event detail page
+  const handleEventDetail = (eventId) => {
+  navigate(`/event/${eventId}`);
+  };
+
   return (
     <div className="flex flex-col w-full h-full overflow-y-scroll bg-gray-100">
       {/* Header Section */}
@@ -166,6 +174,7 @@ export default function MyEvent() {
             </p>
           ) : (
             dateFilteredEvents.map((event, index) => (
+              <div onClick={() => handleEventDetail(event.extendedProps.id)} key={index}>
               <Event
                 key={index}
                 event={{
@@ -178,6 +187,7 @@ export default function MyEvent() {
                 }}
                 isMyEventPage={true} // Hide the join button
               />
+              </div>
             ))
           )}
         </div>

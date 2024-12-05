@@ -22,3 +22,28 @@ export const getAllParticipantWithNoCondition = (req, res) => {
       return res.status(200).json(data);  // Return the participant data to the client
     });
   };
+
+export const getJoinedParticipant = (req, res) => {
+  const eventId = req.params.eventId; // Get event ID from URL parameter
+  console.log("Fetching participants for event ID:", eventId);
+
+  const query = `
+    SELECT p.*, u.username as participantName, u.profilePic as participantImg, e.id as eventId
+    FROM users u
+    JOIN participants p ON p.userId = u.id
+    JOIN events e ON p.eventId = e.id
+    WHERE e.id = ?;
+  `;
+  db.query(query, [eventId], (err, results) => {
+    if (err) {
+      console.error("SQL error fetching participant details:", err);
+      return res.status(500).json({ message: "Internal server error", error: err });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+    // Send back the detailed information for all participants
+    return res.status(200).json({ participant: results });
+  });
+};
+  
