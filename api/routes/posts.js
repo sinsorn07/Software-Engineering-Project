@@ -18,4 +18,6 @@ router.put("/:postId", editPost);
 // Delete a post
 router.delete("/:id", deletePost);
 
+
+
 export default router;

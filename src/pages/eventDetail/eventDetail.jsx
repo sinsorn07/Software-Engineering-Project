@@ -2,14 +2,17 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaEllipsisV } from "react-icons/fa";
 import { makeRequest } from "../../axios";
+import { FaPen } from 'react-icons/fa';
 import BackButton from "../../components/backbutton/BackButton";
 import LeaveEvent from "../../components/leaveEvent/LeaveEvent";
 import DeleteEvent from "../../components/deleteEvent/DeleteEvent";
+import Post from "../../components/post/Post";
 
 const EventDetail = () => {
   const { eventId } = useParams();
   const [event, setEvent] = useState(null);
   const [participant, setParticipant] = useState([]);
+  const [eventPosts, setEventPosts] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [activeTab, setActiveTab] = useState("Participants");
   const [showOptions, setShowOptions] = useState(false);
@@ -31,6 +34,7 @@ const EventDetail = () => {
         const response = await makeRequest.get("/auth/current-user", {
           withCredentials: true,
         });
+        console.log("Fetched posts:", response.data);
         setCurrentUser(response.data);
       } catch (err) {
         console.error("Failed to fetch current user:", err);
@@ -63,11 +67,40 @@ const EventDetail = () => {
       }
     };
 
+    const fetchEventPosts = async () => {
+      try {
+        const response = await makeRequest.get(`/posts?eventId=${eventId}`, {
+          withCredentials: true,
+        });
+        const posts = response.data.map(post => ({
+          postId: post.postId,
+          userId: post.userId,
+          userName: post.userName,
+          img: post.img,
+          profilePic: post.profilePic,
+          description: post.description,
+          created_datetime: post.created_datetime,
+          eventName: post.eventName,
+        }));
+        setEventPosts(posts);
+      } catch (error) {
+        console.error("Failed to fetch posts:", error.message);
+      }
+    };
+    
+    
+    
+    
+
     if (eventId) {
       fetchEventDetails();
       fetchEventParticipants();
+      fetchEventPosts();
     }
   }, [eventId, navigate]);
+
+
+  
 
   // Determine if the current user is the creator or a participant
   const isCreator = event?.creator === currentUser?.id;
@@ -76,6 +109,10 @@ const EventDetail = () => {
 
   // Toggle options dropdown visibility
   const toggleOptions = () => setShowOptions(!showOptions);
+
+  const handleCreatePost = () => {
+    navigate(`/event/${eventId}/create-post`); // Navigate to CreatePost page with event ID
+    };
 
   // Handle navigation to edit event page
   const handleEditEvent = () => navigate(`/edit-event/${eventId}`);
@@ -249,9 +286,16 @@ const EventDetail = () => {
           )}
         </div>
       </div>
+      
+      <button 
+      className="fixed bottom-8 right-8 bg-[#508C9B] hover:bg-[#134B70] text-white p-4 rounded-full shadow-lg transition focus:outline-none"
+      onClick={handleCreatePost}
+      >
+      <FaPen className="text-xl" />
+      </button>      
 
       {/* Dynamic Tabs */}
-      <div className="navbar-section w-full max-w-3xl mt-0 rounded-lg sticky top-0 z-10">
+      <div className="navbar-section w-full max-w-3xl -mt-5 rounded-lg sticky top-0 z-10">
         <div className="flex justify-around border-b-2 border-gray-300 bg-white">
           <button
             onClick={() => setActiveTab("Participants")}
@@ -280,7 +324,13 @@ const EventDetail = () => {
           handleNavigateToProfile={handleNavigateToProfile}
         />
       )}
-      {activeTab === "Posts" && <PostsTab eventId={eventId} />}
+      {activeTab === "Posts" && (<PostsTab
+          eventId={eventId}
+          eventPosts={eventPosts}
+          currentUser={currentUser}
+          handleEditPost={(postId) => console.log(`Edit Post ID: ${postId}`)}
+          handleDeletePost={(postId) => console.log(`Delete Post ID: ${postId}`)}
+        />)}
 
       {/* Leave Event Modal */}
       <LeaveEvent
@@ -300,7 +350,7 @@ const EventDetail = () => {
 
 // DetailsTab Component
 const ParticipantsTab = ({ event, participant, handleNavigateToProfile }) => (
-  <div className="participants-tab w-full max-w-3xl bg-white rounded-lg shadow-md p-6">
+  <div className="participants-tab w-full max-w-3xl bg-white rounded-lg  shadow-md p-6">
     {participant.length > 0 ? (
       participant.map((participantItem) => (
         <div
@@ -324,12 +374,39 @@ const ParticipantsTab = ({ event, participant, handleNavigateToProfile }) => (
   </div>
 );
 
-// PostsTab Component
-const PostsTab = ({ eventId }) => (
+
+// Posts Tab
+const PostsTab = ({ eventId, eventPosts, currentUser, handleEditPost, handleDeletePost }) => (
   <div className="posts-tab w-full max-w-3xl bg-white rounded-lg shadow-md p-6">
-    <h3 className="text-lg font-semibold mb-2">Posts</h3>
-    <p>Posts for event {eventId} will appear here.</p>
+    
+    <h3 className="text-lg font-semibold mb-4">Posts</h3>
+    {eventPosts.length > 0 ? (
+      eventPosts.map((post) => (
+        <Post
+        key={post.postId}
+        postId={post.postId}
+        userId={post.userId}
+        userName={post.userName}
+        img={post.img}
+        profilePic={post.profilePic} 
+        description={post.description}
+        created_datetime={post.created_datetime}
+        eventName={post.eventName}
+        currentUser={currentUser}
+          // likes={post.likes || 0}
+          // comments={post.comments || []}
+          // onProfileClick={(username) => console.log(`Navigate to profile of ${username}`)}
+        onProfileClick={(userId) => handleNavigateToProfile(userId)}
+        onEdit={() => handleEditPost(post.id)}
+        onDelete={() => handleDeletePost(post.id)}
+        />
+      ))
+    ) : (
+      <p>No posts for this event.</p>
+    )}
   </div>
 );
+
+
 
 export default EventDetail;
