@@ -72,22 +72,24 @@ const EventDetail = () => {
         const response = await makeRequest.get(`/posts?eventId=${eventId}`, {
           withCredentials: true,
         });
+    
+        // Parse img field into an array and map the response
         const posts = response.data.map(post => ({
           postId: post.postId,
           userId: post.userId,
           userName: post.userName,
-          img: post.img,
+          img: post.img ? JSON.parse(post.img) : [], // Parse JSON string into array
           profilePic: post.profilePic,
           description: post.description,
           created_datetime: post.created_datetime,
           eventName: post.eventName,
         }));
+    
         setEventPosts(posts);
       } catch (error) {
         console.error("Failed to fetch posts:", error.message);
       }
     };
-    
     
     
     

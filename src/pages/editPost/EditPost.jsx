@@ -1,3 +1,5 @@
+//We won't use this file, Completed EditPost.jsx is in components
+
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaPhotoVideo } from "react-icons/fa";

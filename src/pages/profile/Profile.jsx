@@ -18,27 +18,35 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // const token = localStorage.getItem("accessToken"); // Retrieve token from localStorage
-        // if (!token) throw new Error("No access token found. Please log in again.");
-
-        // const headers = { Authorization: `Bearer ${token}` };
-
-        // Fetch user information
         const userResponse = await axios.get(`http://localhost:8800/api/users/find/${userId}`, {
-            withCredentials: true,
+          withCredentials: true,
         });
         setUserData(userResponse.data);
 
-        // Fetch posts made by the user
         const postsResponse = await axios.get(`http://localhost:8800/api/posts?userId=${userId}`, {
-            withCredentials: true,
+          withCredentials: true,
         });
-        setPosts(postsResponse.data);
+
+        const postsWithParsedImages = postsResponse.data.map((post) => {
+          let parsedImages;
+          try {
+            parsedImages = post.img ? JSON.parse(post.img) : []; // Attempt to parse `img` field
+          } catch {
+            parsedImages = Array.isArray(post.img) ? post.img : [post.img].filter(Boolean); // Fallback to array
+          }
+
+          return {
+            ...post,
+            img: parsedImages, // Ensure `img` is always an array
+          };
+        });
+
+        setPosts(postsWithParsedImages);
       } catch (err) {
-        setError(err.message || "Unable to load user data or posts."); // Handle errors
+        setError(err.message || "Unable to load user data or posts.");
         console.error(err);
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
 
@@ -78,13 +86,11 @@ const Profile = () => {
           className="w-full h-[28rem] object-cover rounded-lg"
         />
         <div className="absolute top-[19rem] left-1/2 transform -translate-x-1/2 w-56 h-56 border-4 border-[#EEEEEE] rounded-full overflow-hidden z-20">
-        <img
-          src={userData && userData.profilePic ? userData.profilePic : "https://i.postimg.cc/nzJJzdBt/default-avatar-profile-icon.jpg"}
-          alt="Profile"
-          className="w-full h-full object-cover"
-        />
-
-
+          <img
+            src={userData && userData.profilePic ? userData.profilePic : "https://i.postimg.cc/nzJJzdBt/default-avatar-profile-icon.jpg"}
+            alt="Profile"
+            className="w-full h-full object-cover"
+          />
         </div>
         <button
           onClick={handleEditProfile}
@@ -112,19 +118,29 @@ const Profile = () => {
                   alt="User"
                   className="w-10 h-10 rounded-full mr-2"
                 />
-                <span className="text-[#201E43] font-bold">{post.name}</span>
-                <span className="ml-3">{post.created_datetime.split("T")[0]}</span>
-                {/* <button className="ml-auto text-[#201E43]">
-                  <FontAwesomeIcon icon={faEllipsisV} />
-                </button> */}
+                <span className="text-[#201E43] font-bold">{post.userName}</span>
+                <span className="ml-3">
+                  {new Date(post.created_datetime).toLocaleString()}
+                </span>
               </div>
               {/* Post Description */}
               <p className="text-[#201E43] mb-3 text-lg">{post.description}</p>
-              {/* Optional Post Image */}
-              {post.img && (
-                <div className="mt-4">
-                  <img src={post.img} alt="Post" className="rounded-lg w-full" />
+              {/* Optional Post Images */}
+              {post.img && post.img.length > 0 && (
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {post.img.map((imageUrl, index) => (
+                    <img
+                      key={index}
+                      src={imageUrl}
+                      alt={`Post Image ${index + 1}`}
+                      className="rounded-lg w-full"
+                    />
+                  ))}
                 </div>
+              )}
+              {/* Event Name */}
+              {post.eventName && (
+                <p className="text-sm text-gray-500 mt-2">Event: {post.eventName}</p>
               )}
             </div>
           ))}
