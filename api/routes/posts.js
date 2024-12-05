@@ -12,4 +12,6 @@ router.post("/", addPost);
 // Delete a post
 router.delete("/:id", deletePost);
 
+
+
 export default router;
