@@ -1,3 +1,137 @@
+ichigozzz
+ichigozzz
+在线
+sorry for gossiping
+
+ichigozzz 重命名频道为：sorry for — 2024/9/29 23:39
+ichigozzz 重命名频道为：sorry for gossip — 2024/9/29 23:39
+ichigozzz发起了一次持续2 小时的语音通话。 — 2024/9/29 23:39
+tiasss — 2024/9/30 0:54
+hehehehehehehehehheheehehehhe
+ichigozzz 重命名频道为：sorry for gossiping — 2024/10/2 15:57
+ichigozzz发起了一次持续3 小时的语音通话。 — 2024/10/5 22:45
+หวานเจี๊ยบ — 2024/10/5 22:50
+start-dfs.sh
+start-yarn.sh
+ichigozzz — 2024/10/6 0:16
+why i cant turn on my microphone
+helpppp
+i ll change my device
+หวานเจี๊ยบ — 2024/10/6 1:22
+Login/Register (Done)
+Feed page (Done)
+Create New Post
+Notification (Done)
+Message (Done)
+Direct Message (Done)
+Search page
+Comments Page
+Profile (Done)
+Edit Profile
+Follow/Unfollow
+Delete Post
+Create Events
+Event page
+ichigozzz — 2024/10/6 1:32
+https://images.app.goo.gl/Ef3u5ohgSfVtZ7yS6
+www.google.com
+Events – List with Search Filter ShortCode - Documentation ...
+Found on Google from docs.mage-people.com
+Events – List with Search Filter ShortCode - Documentation ...
+tiasss发起了一次持续39 分钟的语音通话。 — 2024/10/6 21:41
+ichigozzz — 2024/10/6 21:54
+Videos to watch when you need to refresh:
+
+https://www.youtube.com/watch?v=AZovvBgRLIY
+
+https://www.youtube.com/watch?v=OoEpfb6yga8
+YouTube
+Cloudera, Inc.
+Apache Hadoop & Big Data 101: The Basics
+图片
+YouTube
+Hortonworks
+Basic Introduction to Apache Hadoop
+图片
+ichigozzz — 2024/10/6 22:06
+https://www.youtube.com/watch?v=kEb-LJB23Ns
+YouTube
+Sriw World of Coding
+Ultimate Guide: Setting Up Apache Spark in Anaconda for Jupyter Not...
+图片
+tiasss — 2024/10/7 1:03
+!apt-get update # Update apt-get repository.
+!apt-get install openjdk-8-jdk-headless -qq > /dev/null # Install Java.
+!wget -q http://archive.apache.org/dist/spark/spark-3.1.1/spark-3.1.1-bin-hadoop3.2.tgz # Download Apache Sparks.
+!tar xf spark-3.1.1-bin-hadoop3.2.tgz # Unzip the tgz file.
+!pip install -q findspark # Install findspark. Adds PySpark to the System path during runtime.
+
+Set environment variables
+import os
+os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-8-openjdk-amd64"
+os.environ["SPARK_HOME"] = "/content/spark-3.1.1-bin-hadoop3.2"
+
+!ls
+
+Initialize findspark
+import findspark
+findspark.init()
+
+Create a PySpark session
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.master("local[*]").getOrCreate()
+spark
+!apt-get update # Update apt-get repository.
+!apt-get install openjdk-8-jdk-headless -qq > /dev/null # Install Java.
+!wget -q http://archive.apache.org/dist/spark/spark-3.1.1/spark-3.1.1-bin-hadoop3.2.tgz # Download Apache Sparks.
+!tar xf spark-3.1.1-bin-hadoop3.2.tgz # Unzip the tgz file.
+!pip install -q findspark # Install findspark. Adds PySpark to the System path during runtime.
+展开
+message.txt
+1 KB
+您错过了一次来自หวานเจี๊ยบ的，持续8 分钟的语音通话。 — 2024/10/18 0:23
+tiasss — 2024/10/18 0:27
+图片
+หวานเจี๊ยบ发起了一次持续2 小时的语音通话。 — 2024/11/1 1:06
+tiasss — 2024/11/25 18:35
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=dbkakraiyatae31
+DB_NAME=meetro
+您错过了一次来自หวานเจี๊ยบ的，持续几秒的语音通话。 — 2024/11/25 18:45
+ichigozzz — 2024/11/26 1:28
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEllipsisV, faHeart, faCommentAlt, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+展开
+Profile.jsx
+6 KB
+tiasss发起了一次持续4 分钟的语音通话。 — 2024/11/30 22:19
+ichigozzz发起了一次持续1 小时的语音通话。 — 2024/12/2 10:48
+tiasss — 昨天20:19
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'dbkakraiyatae31'; 
+tiasss — 今天18:28
+import React, { useState, useMemo, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaPen } from "react-icons/fa";
+import Event from "../../components/event/Event";
+import { useQuery } from "@tanstack/react-query";
+import { makeRequest } from "../../axios";
+展开
+message.txt
+8 KB
+tiasss — 今天18:37
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { FaPhotoVideo, FaEdit, FaCheck } from "react-icons/fa";
+import BackButton from "../../components/backbutton/BackButton";
+import axios from "axios";
+展开
+message.txt
+11 KB
+﻿
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaPhotoVideo, FaEdit, FaCheck } from "react-icons/fa";
@@ -5,8 +139,9 @@ import BackButton from "../../components/backbutton/BackButton";
 import axios from "axios";
 
 const EditEvent = () => {
-    const { id } = useParams(); // Get the event ID from the URL
-    console.log("Event ID:", id);
+    const { eventId } = useParams(); // Get the event ID from the URL
+    console.log("Event ID:", eventId);
+
 
     const navigate = useNavigate();
 
@@ -15,11 +150,11 @@ const EditEvent = () => {
         eventName: "",
         description: "",
         locationName: "",
-        locationLink: "",
-        startDate: "",
-        endDate: "",
-        startTime: "",
-        endTime: "",
+        link: "",
+        start_date: "",
+        end_date: "",
+        start_time: "",
+        end_time: "",
     });
     const [image, setImage] = useState(null); // New image to upload
     const [existingImage, setExistingImage] = useState(""); // Existing image URL
@@ -27,11 +162,22 @@ const EditEvent = () => {
     const [loading, setLoading] = useState(false); // Handle submission state
     const [err, setErr] = useState(null); // Handle errors
 
+    const formatDate = (date) => {
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        return new Date(date).toLocaleDateString(undefined, options);
+    };
+    const formatTime = (timeString) => {
+        if (!timeString) return ""; // Handle empty/null cases
+        const [hours, minutes] = timeString.split(":");
+        return `${hours}:${minutes}`; // Return "HH:mm"
+    };
+
+
     // Fetch event details on component load
     useEffect(() => {
         const fetchEventDetails = async () => {
             try {
-                const res = await axios.get(`http://localhost:8800/api/event/${id}`, {
+                const res = await axios.get(`http://localhost:8800/api/event/${eventId}`, {
                     withCredentials: true,
                 });
                 const event = res.data;
@@ -39,12 +185,13 @@ const EditEvent = () => {
                     eventName: event.eventName,
                     description: event.description,
                     locationName: event.locationName,
-                    locationLink: event.link,
-                    startDate: event.start_date,
-                    endDate: event.end_date,
-                    startTime: event.start_time,
-                    endTime: event.end_time,
+                    link: event.link,
+                    start_date: formatDate(event.start_date),
+                    end_date: formatDate(event.end_date),
+                    start_time: formatTime(event.start_time),
+                    end_time: formatTime(event.end_time),
                 });
+
                 setExistingImage(event.img); // Load existing image
             } catch (error) {
                 console.error("Failed to fetch event details:", error);
@@ -52,10 +199,11 @@ const EditEvent = () => {
             }
         };
         fetchEventDetails();
-    }, [id]);
+    }, [eventId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        console.log("Field changed:", name, value);
         setInputs((prev) => ({ ...prev, [name]: value }));
     };
 
@@ -82,9 +230,15 @@ const EditEvent = () => {
         setErr(null);
 
         try {
-            let uploadedFileUrl = existingImage;
+            // Validate required fields before making the API call
+            if (!inputs.eventName || !inputs.start_date || !inputs.end_date) {
+                setErr("Please fill out all required fields.");
+                setLoading(false);
+                return;
+            }
 
-            // Upload new image if provided
+            // Optional image upload logic
+            let uploadedFileUrl = existingImage;
             if (image) {
                 const formData = new FormData();
                 formData.append("file", image);
@@ -101,24 +255,31 @@ const EditEvent = () => {
                 uploadedFileUrl = uploadResponse.data.url;
             }
 
-            // Prepare event data for submission
+            // Map frontend variables to match database column names
             const editEvent = {
                 eventName: inputs.eventName,
                 description: inputs.description,
                 locationName: inputs.locationName,
-                link: inputs.locationLink,
-                start_date: inputs.startDate,
-                end_date: inputs.endDate,
-                start_time: inputs.startTime,
-                end_time: inputs.endTime,
+                link: inputs.link,
+                start_date: inputs.start_date,
+                end_date: inputs.end_date,
+                start_time: inputs.start_time || null,
+                end_time: inputs.end_time || null,
                 img: uploadedFileUrl,
             };
 
-            await axios.put(`http://localhost:8800/api/event/${id}`, editEvent, {
-                withCredentials: true,
-            });
 
-            navigate(`/event/${id}`); // Redirect to the event detail page
+            // Make the PUT request to update the event and location
+            await axios.put(
+                `http://localhost:8800/api/event/${eventId}`,
+                editEvent,
+                {
+                    headers: { "Content-Type": "application/json" },
+                    withCredentials: true,
+                }
+            );
+
+            navigate(`/event/${eventId}`); // Redirect to event detail page
         } catch (error) {
             console.error("Failed to update event:", error);
             setErr("Failed to save changes. Please try again.");
@@ -133,7 +294,7 @@ const EditEvent = () => {
         <div className="edit-event-page flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8 overflow-y-auto">
             <div className="content-container bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
                 <div className="header-section flex items-center justify-start w-full mb-8 relative">
-                    <BackButton onClick={() => navigate(`/event/${id}`)} />
+                    <BackButton onClick={() => navigate(`/event/${eventId}`)} />
                     <h2 className="text-3xl font-bold ml-3">Edit Event Details</h2>
                 </div>
 
@@ -231,3 +392,5 @@ const EditEvent = () => {
 };
 
 export default EditEvent;
+message.txt
+11 KB

@@ -1,6 +1,7 @@
 import { db } from "../connect.js";
 import jwt from "jsonwebtoken";
 
+
 // Middleware for token verification
 const verifyToken = (req, res, next) => {
   const token = req.cookies.accessToken;
@@ -15,7 +16,8 @@ const verifyToken = (req, res, next) => {
 // Get all events (Home Page)
 export const getAllEvents = (req, res) => {
   const q = `
-    SELECT e.*, u.name AS creatorName, l.location_name, l.link
+    SELECT e.*, u.name AS creatorName, l.locationName, l.link,
+           (SELECT COUNT(*) FROM participants WHERE eventId = e.id) AS participantCount
     FROM events AS e
     JOIN users AS u ON u.id = e.creator
     LEFT JOIN location AS l ON l.eventId = e.id
@@ -30,8 +32,17 @@ export const getAllEvents = (req, res) => {
 //get all joined events (My event)
 
 export const getUserEvents = [verifyToken, (req, res) => {
-  const q = `
-    SELECT e.*, u.name AS creatorName, l.location_name, l.link
+  const { selectedDate } = req.query;
+
+  // Validate selectedDate format
+  if (selectedDate && !/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
+    return res.status(400).json("Invalid date format.");
+  }
+
+  // Base query
+  let q = `
+    SELECT e.*, u.name AS creatorName, l.locationName, l.link,
+           (SELECT COUNT(*) FROM participants WHERE eventId = e.id) AS participantCount
     FROM events AS e
     JOIN users AS u ON u.id = e.creator
     JOIN participants AS p ON p.eventId = e.id
@@ -98,6 +109,24 @@ export const getUserEvents = [verifyToken, (req, res) => {
   });
 }];
 
+// Fetch event details by ID
+export const getEventById = (req, res) => {
+  const eventId = req.params.eventId; // Get event ID from URL parameter
+  const q = `
+    SELECT e.*, l.locationName, l.link
+    FROM events AS e
+    LEFT JOIN location AS l ON e.id = l.eventId
+    WHERE e.id = ?
+  `; // Query to fetch event details
+
+  db.query(q, [eventId], (err, data) => {
+    if (err) return res.status(500).json(err); // Handle database errors
+    if (data.length === 0) return res.status(404).json("Event not found!"); // Handle event not found
+    return res.status(200).json(data[0]); // Return event details
+  });
+};
+
+
 // Add a new event
 export const addEvent = [verifyToken, (req, res) => {
   const { eventName, description, start_date, end_date, start_time, end_time, img, locationName, link } = req.body;
@@ -162,11 +191,9 @@ export const addEvent = [verifyToken, (req, res) => {
 }];
 
 
-
-
-
 // Edit an event
 export const editEvent = [verifyToken, (req, res) => {
+  const eventId = req.params.eventId; // Updated to match the new parameter name
   const { eventName, description, start_date, end_date, start_time, end_time, img, locationName, link } = req.body;
 
   // Validation for required fields
@@ -175,28 +202,27 @@ export const editEvent = [verifyToken, (req, res) => {
   }
 
   // Update event details in the events table
-  const q = `
+  const eventUpdateQuery = `
     UPDATE events 
     SET eventName = ?, description = ?, start_date = ?, end_date = ?, start_time = ?, end_time = ?, img = ? 
     WHERE id = ? AND creator = ?
   `;
-
-  const values = [
+  const eventUpdateValues = [
     eventName,
     description,
     start_date,
     end_date,
-    start_time,
-    end_time,
+    start_time || null,
+    end_time || null,
     img || null,
-    req.params.eventId,  // Event ID
+    eventId,        // Use eventId from req.params
     req.userInfo.id // Logged-in user must be the creator
   ];
 
-  db.query(q, values, (err, data) => {
+  db.query(eventUpdateQuery, eventUpdateValues, (err, eventResult) => {
     if (err) return res.status(500).json(err);
 
-    if (data.affectedRows > 0) {
+    if (eventResult.affectedRows > 0) {
       // If location details are provided, update them in the location table
       if (locationName && link) {
         const locationUpdateQuery = `
@@ -204,10 +230,16 @@ export const editEvent = [verifyToken, (req, res) => {
           SET locationName = ?, link = ? 
           WHERE eventId = ?
         `;
-        const locationUpdateValues = [locationName, link, req.params.eventId];
+
+        const locationUpdateValues = [locationName, link, eventId];
 
         db.query(locationUpdateQuery, locationUpdateValues, (err) => {
-          if (err) return res.status(500).json({ error: "Event updated, but location update failed", details: err });
+          if (err) {
+            return res.status(500).json({
+              error: "Event updated, but location update failed",
+              details: err
+            });
+          }
         });
       }
 
@@ -219,6 +251,11 @@ export const editEvent = [verifyToken, (req, res) => {
 }];
 
 
+
+
+
+
+
 // Delete an event
 export const deleteEvent = [verifyToken, (req, res) => {
   const eventId = req.params.eventId; // Event ID from the route parameter
@@ -227,7 +264,7 @@ export const deleteEvent = [verifyToken, (req, res) => {
   const qCheck = `
     SELECT * FROM events WHERE id = ? AND creator = ?
   `;
-  
+
   db.query(qCheck, [eventId, req.userInfo.id], (err, data) => {
     if (err) return res.status(500).json(err);
     if (data.length === 0) return res.status(403).json("You can only delete your own events or this event does not exist.");
@@ -254,8 +291,8 @@ export const joinEvent = [verifyToken, (req, res) => {
     if (err) return res.status(500).json(err);
     if (data.length > 0) return res.status(400).json("You have already joined this event.");
 
-    const q = "INSERT INTO participants(userId, eventId) VALUES (?)";
-    db.query(q, [values], (err, data) => {
+    const q = "INSERT INTO participants(userId, eventId) VALUES (?, ?)";
+    db.query(q, values, (err, data) => {
       if (err) return res.status(500).json(err);
       return res.status(200).json("Successfully joined the event.");
     });
