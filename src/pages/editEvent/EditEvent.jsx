@@ -5,8 +5,9 @@ import BackButton from "../../components/backbutton/BackButton";
 import axios from "axios";
 
 const EditEvent = () => {
-    const { id } = useParams(); // Get the event ID from the URL
-    console.log("Event ID:", id);
+    const { eventId } = useParams(); // Get the event ID from the URL
+    console.log("Event ID:", eventId);
+
 
     const navigate = useNavigate();
 
@@ -15,11 +16,11 @@ const EditEvent = () => {
         eventName: "",
         description: "",
         locationName: "",
-        locationLink: "",
-        startDate: "",
-        endDate: "",
-        startTime: "",
-        endTime: "",
+        link: "",
+        start_date: "",
+        end_date: "",
+        start_time: "",
+        end_time: "",
     });
     const [image, setImage] = useState(null); // New image to upload
     const [existingImage, setExistingImage] = useState(""); // Existing image URL
@@ -27,11 +28,22 @@ const EditEvent = () => {
     const [loading, setLoading] = useState(false); // Handle submission state
     const [err, setErr] = useState(null); // Handle errors
 
+    const formatDate = (date) => {
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        return new Date(date).toLocaleDateString(undefined, options);
+    };
+    const formatTime = (timeString) => {
+        if (!timeString) return ""; // Handle empty/null cases
+        const [hours, minutes] = timeString.split(":");
+        return `${hours}:${minutes}`; // Return "HH:mm"
+    };
+
+
     // Fetch event details on component load
     useEffect(() => {
         const fetchEventDetails = async () => {
             try {
-                const res = await axios.get(`http://localhost:8800/api/event/${id}`, {
+                const res = await axios.get(`http://localhost:8800/api/event/${eventId}`, {
                     withCredentials: true,
                 });
                 const event = res.data;
@@ -39,12 +51,13 @@ const EditEvent = () => {
                     eventName: event.eventName,
                     description: event.description,
                     locationName: event.locationName,
-                    locationLink: event.link,
-                    startDate: event.start_date,
-                    endDate: event.end_date,
-                    startTime: event.start_time,
-                    endTime: event.end_time,
+                    link: event.link,
+                    start_date: formatDate(event.start_date),
+                    end_date: formatDate(event.end_date),
+                    start_time: formatTime(event.start_time),
+                    end_time: formatTime(event.end_time),
                 });
+
                 setExistingImage(event.img); // Load existing image
             } catch (error) {
                 console.error("Failed to fetch event details:", error);
@@ -52,10 +65,11 @@ const EditEvent = () => {
             }
         };
         fetchEventDetails();
-    }, [id]);
+    }, [eventId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        console.log("Field changed:", name, value);
         setInputs((prev) => ({ ...prev, [name]: value }));
     };
 
@@ -82,9 +96,15 @@ const EditEvent = () => {
         setErr(null);
 
         try {
-            let uploadedFileUrl = existingImage;
+            // Validate required fields before making the API call
+            if (!inputs.eventName || !inputs.start_date || !inputs.end_date) {
+                setErr("Please fill out all required fields.");
+                setLoading(false);
+                return;
+            }
 
-            // Upload new image if provided
+            // Optional image upload logic
+            let uploadedFileUrl = existingImage;
             if (image) {
                 const formData = new FormData();
                 formData.append("file", image);
@@ -101,24 +121,31 @@ const EditEvent = () => {
                 uploadedFileUrl = uploadResponse.data.url;
             }
 
-            // Prepare event data for submission
+            // Map frontend variables to match database column names
             const editEvent = {
                 eventName: inputs.eventName,
                 description: inputs.description,
                 locationName: inputs.locationName,
-                link: inputs.locationLink,
-                start_date: inputs.startDate,
-                end_date: inputs.endDate,
-                start_time: inputs.startTime,
-                end_time: inputs.endTime,
+                link: inputs.link,
+                start_date: inputs.start_date,
+                end_date: inputs.end_date,
+                start_time: inputs.start_time || null,
+                end_time: inputs.end_time || null,
                 img: uploadedFileUrl,
             };
 
-            await axios.put(`http://localhost:8800/api/event/${id}`, editEvent, {
-                withCredentials: true,
-            });
 
-            navigate(`/event/${id}`); // Redirect to the event detail page
+            // Make the PUT request to update the event and location
+            await axios.put(
+                `http://localhost:8800/api/event/${eventId}`,
+                editEvent,
+                {
+                    headers: { "Content-Type": "application/json" },
+                    withCredentials: true,
+                }
+            );
+
+            navigate(`/event/${eventId}`); // Redirect to event detail page
         } catch (error) {
             console.error("Failed to update event:", error);
             setErr("Failed to save changes. Please try again.");
@@ -133,7 +160,7 @@ const EditEvent = () => {
         <div className="edit-event-page flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8 overflow-y-auto">
             <div className="content-container bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
                 <div className="header-section flex items-center justify-start w-full mb-8 relative">
-                    <BackButton onClick={() => navigate(`/event/${id}`)} />
+                    <BackButton onClick={() => navigate(`/event/${eventId}`)} />
                     <h2 className="text-3xl font-bold ml-3">Edit Event Details</h2>
                 </div>
 

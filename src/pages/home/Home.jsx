@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPen } from "react-icons/fa";
 import Event from "../../components/event/Event";
@@ -7,57 +7,45 @@ import { makeRequest } from "../../axios";
 import { AuthContext } from "../../context/authContext";
 
 export default function Home() {
-  // Fetch events from the backend
+  // Fetching events from the backend using React Query
   const { isLoading, error, data } = useQuery({
-    queryKey: ["event"],
+    queryKey: ["event"], // Unique key for caching event data
     queryFn: () => makeRequest.get("/event").then((res) => res.data),
   });
 
-  const { isLoading: participantLoading, error: participantError, data: participantsData } = useQuery({
-    queryKey: ["participants"], // Keep the query key as before
-    queryFn: () =>
-      makeRequest.get("/participant/findAll") // Call the backend API endpoint
-        .then((res) => res.data), // Extract data from the response
-  });
+  // Accessing the current user from AuthContext
+  const { currentUser } = useContext(AuthContext);
 
-  // console.log("isLoading Var:", isLoading);
-  // console.log("error Var:", error);
-  // console.log("data Var:", data);
-  const { currentUser } = useContext(AuthContext); // Access the current user from AuthContext
+  // React Router's navigation hook
   const navigate = useNavigate();
 
-  // State for search and filter
-  const [filter, setFilter] = useState("latest");
-  const [searchText, setSearchText] = useState("");
-  const [event, setEvents] = useState([]);
+  // States for search and filter
+  const [filter, setFilter] = useState("latest"); // Default filter is "latest"
+  const [searchText, setSearchText] = useState(""); // Search text input
 
-  // Populate events when data is fetched from backend
-  useEffect(() => {
-    if (data) setEvents(data);
-  }, [data]);
+  const [joinedEvents, setJoinedEvents] = useState([]); // Track joined events globally
 
-  // Filtering Logic
-  const filteredEvents = event.filter((event) => {
-    if (filter === "latest") {
-      return true; // Default: Show all events
-    } else if (filter === "hit") {
-      return event.isPopular; // Assuming `isPopular` exists in your event data
-    }
-    return true;
-  });
+  // Filtering and searching logic memoized for optimization
+  const filteredEvents = useMemo(() => {
+    if (!data) return [];
+    return data
+      .filter((event) => {
+        if (filter === "latest") return true; // Show all events by default
+        if (filter === "hit") return event.isPopular; // Show popular events
+        return true; // Default fallback
+      })
+      .filter((event) =>
+        event.eventName.toLowerCase().includes(searchText.toLowerCase())
+      ); // Search filtering
+  }, [data, filter, searchText]);
 
-  // Search Logic
-  const searchedEvents = filteredEvents.filter((event) =>
-    event.eventName.toLowerCase().includes(searchText.toLowerCase())
-  );
-
-  // Format Date Helper Function
+  // Helper function for date formatting
   const formatDate = (date) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(date).toLocaleDateString(undefined, options);
   };
 
-  // Handle joining an event
+  // Function to handle joining an event
   const handleJoinEvent = async (eventId) => {
     if (!currentUser) {
       alert("Please log in to join events.");
@@ -65,22 +53,15 @@ export default function Home() {
     }
 
     try {
-      const response = await makeRequest.post(
-        `/event/join`,
-        { eventId }, // Pass event ID as payload
-        { withCredentials: true }
-      );
+      // Send eventId and userId to the backend
+      const response = await makeRequest.post("/event/join", {
+        eventId,
+        userId: currentUser.id, // Include userId from AuthContext
+      });
 
       if (response.status === 200) {
         alert("You have successfully joined the event!");
-        // Update the participants for the joined event
-        setEvents((prevEvents) =>
-          prevEvents.map((event) =>
-            event.id === eventId
-              ? { ...event, participants: event.participants ? [...event.participants, currentUser] : [currentUser] }
-              : event
-          )
-        );
+        setJoinedEvents((prev) => [...prev, eventId]); // Update joined events
       } else {
         throw new Error("Failed to join the event.");
       }
@@ -90,12 +71,17 @@ export default function Home() {
     }
   };
 
-
-
-  // Navigate to event detail page
-  const handleEventDetail = (eventId) => {
-    navigate(`/event/${eventId}`);
+  const handleJoinClick = (event, eventId) => {
+    event.preventDefault(); // Prevent default behavior like page reload
+    handleJoinEvent(eventId); // Call the join event logic
   };
+
+
+  // Function to navigate to the event detail page
+  const handleEventDetail = (eventId) => {
+    navigate(`/event/${eventId}`); // Redirect to the event detail page
+  };
+
 
   return (
     <div className="flex flex-col w-full h-full overflow-y-scroll bg-gray-100">
@@ -106,9 +92,7 @@ export default function Home() {
           </label>
           <form
             className="mt-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-            }}
+            onSubmit={(e) => e.preventDefault()}
           >
             <input
               type="search"
@@ -132,7 +116,7 @@ export default function Home() {
           <select
             id="filter"
             value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            onChange={(event) => setFilter(event.target.value)}
             className="border outline-0 px-2.5 py-1 text-sm text-gray-800 bg-white rounded-xl focus:border-indigo-600 transition-all duration-100"
           >
             <option value="hit">Hit</option>
@@ -145,13 +129,15 @@ export default function Home() {
           {isLoading ? (
             <p>Loading...</p>
           ) : error ? (
-            <p>Something went wrong!</p>
+            <p className="text-red-500">Error: {error.message || "Something went wrong!"}</p>
           ) : (
-            searchedEvents.map((event, index) => (
+            filteredEvents.map((event) => (
               <Event
-                key={index}
+                key={event.eventId}
                 event={{
-                  id: event.id,
+                  ...event,
+                  isJoined: joinedEvents.includes(event.eventId), // Pass joined state
+                  eventId: event.eventId,
                   eventName: event.eventName,
                   description: event.description,
                   locationName: event.locationName,
@@ -159,6 +145,8 @@ export default function Home() {
                   endDate: formatDate(event.end_date),
                   image: event.img,
                 }}
+                onJoin={() => handleJoinEvent(event.eventId)}
+                onDetail={() => handleEventDetail(event.eventId)}
                 className="flex flex-col justify-between rounded-lg bg-white shadow-lg p-4"
               >
                 <div className="flex flex-col gap-2">
@@ -182,24 +170,20 @@ export default function Home() {
                 </div>
                 <button
                   className="mt-auto rounded-full bg-[#508C9B] px-6 py-2 text-white hover:bg-[#134B70] transition-all duration-200"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleJoinEvent(event.id);
-                  }}
-               >
+                  onClick={(event) => handleJoinClick(event, event.eventId)}
+                >
                   Join
                 </button>
               </Event>
             ))
           )}
         </div>
-
         <Link
-          to="/create-event"
-          className="flex items-center justify-center text-white fixed bottom-8 right-8 rounded-full w-[48px] h-[48px] bg-[#508C9B] hover:bg-[#134B70] transition-all duration-100 shadow-xl"
-        >
-          <FaPen className="text-md" />
-        </Link>
+        to="/create-event"
+        className="flex items-center justify-center text-white fixed bottom-8 right-8 rounded-full w-[48px] h-[48px] bg-[#508C9B] hover:bg-[#134B70] transition-all duration-100 shadow-xl"
+      >
+        <FaPen className="text-md" />
+      </Link>
       </div>
     </div>
   );
