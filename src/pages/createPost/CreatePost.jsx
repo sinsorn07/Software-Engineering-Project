@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
 import BackButton from "../../components/backbutton/BackButton";
 
 const CreatePost = ({ onClose }) => {
-  const { id } = useParams(); // Get the eventId from the URL
+  const { eventId } = useParams(); // Get the eventId from the URL
   const navigate = useNavigate(); // Initialize useNavigate
 
   const [description, setDescription] = useState("");
@@ -34,7 +34,7 @@ const CreatePost = ({ onClose }) => {
 
   const handleBackButtonClick = () => {
     // Navigate back to the EventDetail page with the event ID
-    navigate(`/event/${id}`);
+    navigate(`/event/${eventId}`);
   };
 
   return (

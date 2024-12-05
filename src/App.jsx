@@ -15,7 +15,7 @@ import CreatePost from "./pages/createPost/CreatePost";
 import CreateEvent from "./pages/createEvent/CreateEvent";
 import EventDetail from "./pages/eventDetail/eventDetail";
 import EditEvent from "./pages/editEvent/EditEvent";
-import EditProfile from "./pages/editProfile/EditProfile";
+import EditProfile from "./pages/EditProfile/EditProfile";
 import MyEvent from "./pages/myEvent/MyEvent";
 import Chat from "./pages/chat/Chat";
 import Home from "./pages/home/Home";

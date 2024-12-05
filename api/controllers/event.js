@@ -118,7 +118,7 @@ export const getEventById = (req, res) => {
     u.username AS creatorName, 
     u.profilePic AS creatorProfilePic, 
     l.locationName, 
-    l.link AS locationLink
+    l.link AS link
   FROM 
     events AS e
   LEFT JOIN
@@ -142,59 +142,72 @@ export const addEvent = [verifyToken, (req, res) => {
   const { eventName, description, start_date, end_date, start_time, end_time, img, locationName, link } = req.body;
 
   // Validation for required fields
-  // if (!eventName || !start_date || !end_date || !locationName || !link) {
-  //   return res.status(400).json("Required fields are missing!");
-  // }
+  if (!eventName || !start_date || !end_date || !locationName || !link) {
+    return res.status(400).json("Required fields are missing!");
+  }
 
   // Query to check if the event already exists
-  const q = `
+  const checkEventQuery = `
     SELECT * FROM events 
     WHERE eventName = ? AND creator = ? AND start_date = ? AND end_date = ?
   `;
+  const checkEventValues = [eventName, req.userInfo.id, start_date, end_date];
 
-  const values = [eventName, req.userInfo.id, start_date, end_date];
-
-  db.query(q, values, (err, result) => {
-    if (err) return res.status(500).json(err);
+  db.query(checkEventQuery, checkEventValues, (err, result) => {
+    if (err) return res.status(500).json({ message: "Database error during event check", error: err });
 
     if (result.length > 0) {
       return res.status(409).json("Event already exists!");
     }
 
     // Insert into events table
-    const q = `
+    const insertEventQuery = `
       INSERT INTO events(eventName, description, creator, start_date, end_date, start_time, end_time, img) 
-      VALUES (?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
-
-    const values = [
+    const insertEventValues = [
       eventName,
       description,
       req.userInfo.id, // Creator is the logged-in user
       start_date,
       end_date,
-      start_time,
-      end_time,
+      start_time || null,
+      end_time || null,
       img || null // Optional image
     ];
 
-    db.query(q, [values], (err, data) => {
-      if (err) return res.status(500).json(err);
+    db.query(insertEventQuery, insertEventValues, (err, data) => {
+      if (err) return res.status(500).json({ message: "Database error during event insertion", error: err });
 
       const eventId = data.insertId; // Get the newly created event ID
 
       // Insert into location table
-      const q = `
+      const insertLocationQuery = `
         INSERT INTO location(locationName, link, eventId)
         VALUES (?, ?, ?)
       `;
+      const insertLocationValues = [locationName, link, eventId];
 
-      const values = [locationName, link, eventId];
+      db.query(insertLocationQuery, insertLocationValues, (err) => {
+        if (err) return res.status(500).json({ message: "Database error during location insertion", error: err });
 
-      db.query(q, values, (err, locationResult) => {
-        if (err) return res.status(500).json(err);
+        // Add creator as a participant
+        const addParticipantQuery = `
+          INSERT INTO participants(eventId, userId) 
+          VALUES (?, ?)
+        `;
+        const addParticipantValues = [eventId, req.userInfo.id];
 
-        return res.status(200).json("Event has been created.");
+        db.query(addParticipantQuery, addParticipantValues, (err) => {
+          if (err) {
+            return res.status(500).json({
+              message: "Event created, but failed to add creator as participant.",
+              error: err
+            });
+          }
+
+          return res.status(200).json("Event has been created successfully.");
+        });
       });
     });
   });
@@ -259,7 +272,6 @@ export const editEvent = [verifyToken, (req, res) => {
     return res.status(403).json("You can only edit your own events.");
   });
 }];
-
 
 
 
