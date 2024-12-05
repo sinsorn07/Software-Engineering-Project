@@ -45,41 +45,42 @@ const CreateEvent = () => {
     setErr(null);
 
     try {
-      let uploadedFilename = null;
-
+      let uploadedFileUrl = null; // Updated variable name for clarity
+    
       // Upload the image first if it exists
       if (image) {
         const formData = new FormData();
         formData.append("file", image);
-
+    
         const uploadResponse = await axios.post("http://localhost:8800/api/uploads/file", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
           withCredentials: true, // Include cookies for authentication
         });
-
-        uploadedFilename = uploadResponse.data.filename;
+    
+        // Get the URL directly from the server response
+        uploadedFileUrl = uploadResponse.data.url; // Use the `url` field from the response
       }
-
+    
       // Prepare event data
       const eventPayload = {
         eventName: inputs.eventName,
         description: inputs.description,
-        location_name: inputs.locationName,
+        locationName: inputs.locationName,
         link: inputs.locationLink,
         start_date: inputs.start_date,
         end_date: inputs.end_date,
         start_time: inputs.start_time || "00:00",
         end_time: inputs.end_time || "00:00",
-        img: uploadedFilename, // Include the uploaded image filename
+        img: uploadedFileUrl, // Use the URL returned from the backend
       };
-
+    
       // Create the event
-      await axios.post("http://localhost:8800/api/events", eventPayload, {
+      await axios.post("http://localhost:8800/api/event", eventPayload, {
         withCredentials: true,
       });
-
+    
       navigate("/"); // Redirect to home on success
     } catch (error) {
       console.error(error);
@@ -87,6 +88,7 @@ const CreateEvent = () => {
     } finally {
       setLoading(false);
     }
+    
   };
   
   

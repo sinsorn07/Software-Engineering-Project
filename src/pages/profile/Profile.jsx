@@ -73,16 +73,18 @@ const Profile = () => {
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
         <img
-          src={userData.coverPic || "https://via.placeholder.com/600x300"}
+          src={userData.coverPic || "https://via.placeholder.com/600x300/cccccc/cccccc"}
           alt="Cover"
           className="w-full h-[28rem] object-cover rounded-lg"
         />
         <div className="absolute top-[19rem] left-1/2 transform -translate-x-1/2 w-56 h-56 border-4 border-[#EEEEEE] rounded-full overflow-hidden z-20">
-          <img
-            src={userData.profilePic || "https://via.placeholder.com/150"}
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
+        <img
+          src={userData && userData.profilePic ? userData.profilePic : "https://i.postimg.cc/nzJJzdBt/default-avatar-profile-icon.jpg"}
+          alt="Profile"
+          className="w-full h-full object-cover"
+        />
+
+
         </div>
         <button
           onClick={handleEditProfile}

@@ -7,6 +7,7 @@ import { makeRequest } from "../../axios";
 import FullCalendar from "@fullcalendar/react"; // FullCalendar React component
 import dayGridPlugin from "@fullcalendar/daygrid"; // FullCalendar day grid plugin
 import interactionPlugin from "@fullcalendar/interaction"; // To handle user interactions
+import { useNavigate } from 'react-router-dom';
 
 export default function MyEvent() {
   const [selectedDate, setSelectedDate] = useState(null); // Selected date
@@ -18,7 +19,7 @@ export default function MyEvent() {
   const { isLoading, error, data } = useQuery({
     queryKey: ["userEvents"],
     queryFn: () =>
-      makeRequest.get("/events/user").then((res) =>
+      makeRequest.get("/event/user").then((res) =>
         res.data.map((event) => ({
           title: event.eventName,
           start: event.start_date,
@@ -90,6 +91,13 @@ export default function MyEvent() {
   const formatDate = (date) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(date).toLocaleDateString(undefined, options);
+  };
+
+  const navigate = useNavigate();
+
+  // Navigate to event detail page
+  const handleEventDetail = (eventId) => {
+  navigate(`/event/${eventId}`);
   };
 
   return (
@@ -166,18 +174,20 @@ export default function MyEvent() {
             </p>
           ) : (
             dateFilteredEvents.map((event, index) => (
+              <div onClick={() => handleEventDetail(event.extendedProps.id)} key={index}>
               <Event
                 key={index}
                 event={{
                   eventName: event.title,
                   description: event.extendedProps.description,
-                  locationName: event.extendedProps.location_name,
+                  locationName: event.extendedProps.locationName,
                   startDate: formatDate(event.start),
                   endDate: formatDate(event.end),
                   image: event.extendedProps.img,
                 }}
                 isMyEventPage={true} // Hide the join button
               />
+              </div>
             ))
           )}
         </div>

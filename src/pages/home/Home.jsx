@@ -1,21 +1,35 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FaPen } from "react-icons/fa";
 import Event from "../../components/event/Event";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
+import { AuthContext } from "../../context/authContext";
 
 export default function Home() {
   // Fetch events from the backend
   const { isLoading, error, data } = useQuery({
-    queryKey: ["events"],
-    queryFn: () => makeRequest.get("/events").then((res) => res.data),
+    queryKey: ["event"],
+    queryFn: () => makeRequest.get("/event").then((res) => res.data),
   });
+
+  const { isLoading: participantLoading, error: participantError, data: participantsData } = useQuery({
+    queryKey: ["participants"], // Keep the query key as before
+    queryFn: () =>
+      makeRequest.get("/participant/findAll") // Call the backend API endpoint
+        .then((res) => res.data), // Extract data from the response
+  });
+
+  // console.log("isLoading Var:", isLoading);
+  // console.log("error Var:", error);
+  // console.log("data Var:", data);
+  const { currentUser } = useContext(AuthContext); // Access the current user from AuthContext
+  const navigate = useNavigate();
 
   // State for search and filter
   const [filter, setFilter] = useState("latest");
   const [searchText, setSearchText] = useState("");
-  const [events, setEvents] = useState([]);
+  const [event, setEvents] = useState([]);
 
   // Populate events when data is fetched from backend
   useEffect(() => {
@@ -23,7 +37,7 @@ export default function Home() {
   }, [data]);
 
   // Filtering Logic
-  const filteredEvents = events.filter((event) => {
+  const filteredEvents = event.filter((event) => {
     if (filter === "latest") {
       return true; // Default: Show all events
     } else if (filter === "hit") {
@@ -41,6 +55,46 @@ export default function Home() {
   const formatDate = (date) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(date).toLocaleDateString(undefined, options);
+  };
+
+  // Handle joining an event
+  const handleJoinEvent = async (eventId) => {
+    if (!currentUser) {
+      alert("Please log in to join events.");
+      return;
+    }
+
+    try {
+      const response = await makeRequest.post(
+        `/event/join`,
+        { eventId }, // Pass event ID as payload
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        alert("You have successfully joined the event!");
+        // Update the participants for the joined event
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id === eventId
+              ? { ...event, participants: event.participants ? [...event.participants, currentUser] : [currentUser] }
+              : event
+          )
+        );
+      } else {
+        throw new Error("Failed to join the event.");
+      }
+    } catch (error) {
+      console.error("Failed to join the event:", error);
+      alert("An error occurred while trying to join the event.");
+    }
+  };
+
+
+
+  // Navigate to event detail page
+  const handleEventDetail = (eventId) => {
+    navigate(`/event/${eventId}`);
   };
 
   return (
@@ -97,9 +151,10 @@ export default function Home() {
               <Event
                 key={index}
                 event={{
+                  id: event.id,
                   eventName: event.eventName,
                   description: event.description,
-                  locationName: event.location_name,
+                  locationName: event.locationName,
                   startDate: formatDate(event.start_date),
                   endDate: formatDate(event.end_date),
                   image: event.img,
@@ -121,13 +176,17 @@ export default function Home() {
                   </p>
                   <p className="text-sm text-gray-500">
                     <span className="text-[#508C9B] font-semibold">
-                      {event.location_name || "Location not provided"}
+                      {event.locationName || "Location not provided"}
                     </span>
                   </p>
                 </div>
                 <button
                   className="mt-auto rounded-full bg-[#508C9B] px-6 py-2 text-white hover:bg-[#134B70] transition-all duration-200"
-                >
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleJoinEvent(event.id);
+                  }}
+               >
                   Join
                 </button>
               </Event>

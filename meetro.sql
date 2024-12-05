@@ -149,7 +149,7 @@ DROP TABLE IF EXISTS `location`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `location` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `location_name` varchar(45) NOT NULL,
+  `locationName` varchar(45) NOT NULL,
   `link` varchar(255) DEFAULT NULL,
   `eventId` int DEFAULT NULL,
   PRIMARY KEY (`id`),

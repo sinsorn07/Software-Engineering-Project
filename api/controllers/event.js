@@ -15,8 +15,7 @@ const verifyToken = (req, res, next) => {
 // Get all events (Home Page)
 export const getAllEvents = (req, res) => {
   const q = `
-    SELECT e.*, u.name AS creatorName, l.location_name, l.link,
-           (SELECT COUNT(*) FROM participants WHERE eventId = e.id) AS participantCount
+    SELECT e.*, u.name AS creatorName, l.location_name, l.link
     FROM events AS e
     JOIN users AS u ON u.id = e.creator
     LEFT JOIN location AS l ON l.eventId = e.id
@@ -31,17 +30,8 @@ export const getAllEvents = (req, res) => {
 //get all joined events (My event)
 
 export const getUserEvents = [verifyToken, (req, res) => {
-  const { selectedDate } = req.query;
-
-  // Validate selectedDate format
-  if (selectedDate && !/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
-    return res.status(400).json("Invalid date format.");
-  }
-
-  // Base query
-  let q = `
-    SELECT e.*, u.name AS creatorName, l.location_name, l.link,
-           (SELECT COUNT(*) FROM participants WHERE eventId = e.id) AS participantCount
+  const q = `
+    SELECT e.*, u.name AS creatorName, l.location_name, l.link
     FROM events AS e
     JOIN users AS u ON u.id = e.creator
     JOIN participants AS p ON p.eventId = e.id
@@ -108,13 +98,12 @@ export const getUserEvents = [verifyToken, (req, res) => {
   });
 }];
 
-
 // Add a new event
 export const addEvent = [verifyToken, (req, res) => {
-  const { eventName, description, start_date, end_date, start_time, end_time, img, location_name, link } = req.body;
+  const { eventName, description, start_date, end_date, start_time, end_time, img, locationName, link } = req.body;
 
   // Validation for required fields
-  // if (!eventName || !start_date || !end_date || !location_name || !link) {
+  // if (!eventName || !start_date || !end_date || !locationName || !link) {
   //   return res.status(400).json("Required fields are missing!");
   // }
 
@@ -157,11 +146,11 @@ export const addEvent = [verifyToken, (req, res) => {
 
       // Insert into location table
       const q = `
-        INSERT INTO location(location_name, link, eventId)
+        INSERT INTO location(locationName, link, eventId)
         VALUES (?, ?, ?)
       `;
 
-      const values = [location_name, link, eventId];
+      const values = [locationName, link, eventId];
 
       db.query(q, values, (err, locationResult) => {
         if (err) return res.status(500).json(err);
@@ -178,7 +167,7 @@ export const addEvent = [verifyToken, (req, res) => {
 
 // Edit an event
 export const editEvent = [verifyToken, (req, res) => {
-  const { eventName, description, start_date, end_date, start_time, end_time, img, location_name, link } = req.body;
+  const { eventName, description, start_date, end_date, start_time, end_time, img, locationName, link } = req.body;
 
   // Validation for required fields
   if (!eventName || !start_date || !end_date) {
@@ -200,7 +189,7 @@ export const editEvent = [verifyToken, (req, res) => {
     start_time,
     end_time,
     img || null,
-    req.params.id,  // Event ID
+    req.params.eventId,  // Event ID
     req.userInfo.id // Logged-in user must be the creator
   ];
 
@@ -209,13 +198,13 @@ export const editEvent = [verifyToken, (req, res) => {
 
     if (data.affectedRows > 0) {
       // If location details are provided, update them in the location table
-      if (location_name && link) {
+      if (locationName && link) {
         const locationUpdateQuery = `
           UPDATE location 
-          SET location_name = ?, link = ? 
+          SET locationName = ?, link = ? 
           WHERE eventId = ?
         `;
-        const locationUpdateValues = [location_name, link, req.params.id];
+        const locationUpdateValues = [locationName, link, req.params.eventId];
 
         db.query(locationUpdateQuery, locationUpdateValues, (err) => {
           if (err) return res.status(500).json({ error: "Event updated, but location update failed", details: err });
@@ -232,7 +221,7 @@ export const editEvent = [verifyToken, (req, res) => {
 
 // Delete an event
 export const deleteEvent = [verifyToken, (req, res) => {
-  const eventId = req.params.id; // Event ID from the route parameter
+  const eventId = req.params.eventId; // Event ID from the route parameter
 
   // Query to check if the event exists and if the current user is the creator
   const qCheck = `

@@ -25,6 +25,19 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
+  const logout = async () => {
+    try {
+      await axios.post("http://localhost:8800/api/auth/logout", {}, {
+        withCredentials: true,
+      });
+      setCurrentUser(null);
+      localStorage.removeItem("user");
+    } catch (err) {
+      console.error("Logout failed:", err.response?.data || err.message);
+    }
+  };
+  
+
   // Function to update the current user data
   const updateUser = (updatedData) => {
     setCurrentUser((prevUser) => ({
@@ -48,7 +61,7 @@ export const AuthContextProvider = ({ children }) => {
   }, [currentUser]);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, updateUser }}>
+    <AuthContext.Provider value={{ currentUser, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -15,13 +15,15 @@ export const register = (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(req.body.password, salt);
 
-    const q = "INSERT INTO users (`username`,`email`,`password`,`name`) VALUE (?)";
+    const q = "INSERT INTO users (`username`,`email`,`password`,`name`,`profilePic`, `coverPic`) VALUE (?)";
 
     const values = [
       req.body.username,
       req.body.email,
       hashedPassword,
       req.body.name,
+      'https://i.postimg.cc/nzJJzdBt/default-avatar-profile-icon.jpg', //default profile image
+      'https://i.postimg.cc/K8YP1SSP/1.jpg', //default cover image
     ];
 
     db.query(q, [values], (err, data) => {
@@ -59,7 +61,15 @@ export const login = (req, res) => {
       .json(others);
   });
 };
+export const getCurrentUser = (req, res) => {
+  const token = req.cookies.accessToken; // get token from cookies
+  if (!token) return res.status(401).json("Not logged in!");
 
+  jwt.verify(token, "secretkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+    res.status(200).json(userInfo); // return user info
+  });
+};
 
 export const logout = (req, res) => {
   res.clearCookie("accessToken",{
