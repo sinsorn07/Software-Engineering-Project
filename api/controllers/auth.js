@@ -22,6 +22,8 @@ export const register = (req, res) => {
       req.body.email,
       hashedPassword,
       req.body.name,
+      'https://i.postimg.cc/nzJJzdBt/default-avatar-profile-icon.jpg', //default profile image
+      'https://i.postimg.cc/K8YP1SSP/1.jpg', //default cover image
     ];
 
     db.query(q, [values], (err, data) => {
