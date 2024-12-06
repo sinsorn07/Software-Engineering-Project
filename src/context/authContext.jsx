@@ -60,8 +60,23 @@ export const AuthContextProvider = ({ children }) => {
     }
   }, [currentUser]);
 
+  
+  const joinEvent = async (eventId, userId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8800/api/event/joinEvent",
+        { eventId, userId },
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (err) {
+      console.error("Join event failed:", err.response?.data || err.message);
+      throw err;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ currentUser, login, logout, updateUser, joinEvent }}>
       {children}
     </AuthContext.Provider>
   );

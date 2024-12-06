@@ -1,49 +1,38 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { FaLocationArrow } from "react-icons/fa";
 import axios from "axios";
+import { useContext } from "react";
+import { AuthContext } from "../../context/authContext"; // ใช้ AuthContext
 
 export default function Event({ event, isMyEventPage }) {
+  const { currentUser } = useContext(AuthContext); // ดึง currentUser จาก AuthContext
   const [isJoined, setIsJoined] = useState(false); // Track if the user has joined the event
 
-  //TODO Get Join Status for each event
-  const [participants, setParticipants] = useState([]);
+  const handleJoinEvent = async (eventId) => {
+    try {
+      const response = await axios.post("/event/joinEvent", {
+        eventId,
+        userId: currentUser.id, // ใช้ currentUser.id จาก AuthContext
+      });
+      if (response.status === 200) {
+        setIsJoined(true); // Mark as joined if the request is successful
+      }
+    } catch (error) {
+      console.error("Error joining event:", error);
+    }
+  };
 
   const handleJoinClick = (e) => {
-    e.preventDefault(); // Prevent link navigation
-    //TODO API INSERT TABLe --> API PASS "setIsJoined(true);"
-    // try {
-      //   const response = makeRequest.post(
-        //     `/event/join`,
-        //     { eventId }, // Pass event ID as payload
-        //     { withCredentials: true }
-        //   );
-        
-        //   if (response.status === 200) {
-          //     alert("You have successfully joined the event!");
-          //     // Update the participants for the joined event
-          //     setEvents((prevEvents) =>
-            //       prevEvents.map((event) =>
-              //         event.id === eventId
-          //           ? { ...event, participants: event.participants ? [...event.participants, currentUser] : [currentUser] }
-          //           : event
-          //       )
-          //     );
-          //   } else {
-            //     throw new Error("Failed to join the event.");
-            //   }
-  // } catch (error) {
-    //   console.error("Failed to join the event:", error);
-    //   alert("An error occurred while trying to join the event.");
-    // }
-
-    setIsJoined(true); // Mark as joined
+    e.preventDefault();
+    if (currentUser?.id) {  // ตรวจสอบว่า currentUser มีค่า id หรือไม่
+      handleJoinEvent(event.id);
+    } else {
+      alert("Please log in to join the event.");
+    }
   };
     
   return (
     <div className="overflow-hidden relative w-full rounded-2xl bg-zinc-50 border border-zinc-300">
-      {/* Wrapping the entire card with a Link to navigate when clicked */}
-      <Link to={`/event/${event.id}`} className="block">
         <section className="relative h-[300px] overflow-hidden">
           <img
             src={event.image}
@@ -64,28 +53,21 @@ export default function Event({ event, isMyEventPage }) {
             </a>
           </span>
         </section>
-      </Link>
 
       {/* Join Button */}
       {!isMyEventPage && (
         <div className="flex items-center justify-center pb-2 mb-4">
-
           <button
-            onClick={() => {
-              handleJoinClick();
-              handleJoinEvent(event.id);
-            }}
-            className={`flex w-[90%] items-center justify-center ${
+            onClick={handleJoinClick}
+            className={`w-[90%] flex items-center justify-center text-white text-sm px-4 py-2 rounded-xl transition-all duration-100 ${
               isJoined ? "bg-gray-400 cursor-not-allowed" : "bg-[#508C9B] hover:bg-[#134B70]"
-            } text-white text-sm px-4 py-2 rounded-xl transition-all duration-100`}
+            }`}
             disabled={isJoined} // Disable button if already joined
           >
             {isJoined ? "Joined" : "Join"}
           </button>
-
         </div>
       )}
-
     </div>
   );
 }

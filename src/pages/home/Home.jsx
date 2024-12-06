@@ -54,7 +54,7 @@ export default function Home() {
 
     try {
       // Send eventId and userId to the backend
-      const response = await makeRequest.post("/event/join", {
+      const response = await makeRequest.post("/event/joinEvent", {
         eventId,
         userId: currentUser.id, // Include userId from AuthContext
       });
@@ -71,17 +71,10 @@ export default function Home() {
     }
   };
 
-  const handleJoinClick = (event, eventId) => {
-    event.preventDefault(); // Prevent default behavior like page reload
-    handleJoinEvent(eventId); // Call the join event logic
-  };
-
-
   // Function to navigate to the event detail page
   const handleEventDetail = (eventId) => {
-    navigate(`/event/${eventId}`); // Redirect to the event detail page
+    navigate(`/event/${eventId}`); // Corrected template literal for navigation
   };
-
 
   return (
     <div className="flex flex-col w-full h-full overflow-y-scroll bg-gray-100">
