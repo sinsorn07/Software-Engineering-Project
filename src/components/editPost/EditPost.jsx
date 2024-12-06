@@ -1,145 +1,193 @@
 import React, { useState, useEffect } from "react";
-import { FaTimes, FaPhotoVideo } from "react-icons/fa";
+import { useParams, useNavigate } from "react-router-dom";
+import { FaPhotoVideo, FaTimes } from "react-icons/fa";
+import axios from "axios";
 
-const EditPostPopup = ({ isOpen, onClose, postContent, postImage, onSave }) => {
-  // State to manage the updated content and image
-  const [content, setContent] = useState(postContent || "");
-  const [images, setImages] = useState(postImage ? [postImage] : []); // Initialize with passed image
+const EditPost = () => {
+  const { postId } = useParams();
+  const navigate = useNavigate();
 
-  // Handle image upload
-  const handleImageChange = (e) => {
+  // State for post data
+  const [content, setContent] = useState("");
+  const [images, setImages] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState(null);
+
+  // Fetch existing post details on mount
+  useEffect(() => {
+    const fetchPostDetails = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8800/api/posts/${postId}`, {
+          withCredentials: true,
+        });
+        const post = res.data;
+        setContent(post.description || "");
+        setExistingImages(post.img ? JSON.parse(post.img) : []);
+      } catch (error) {
+        setErr("Failed to fetch post details. Please try again.");
+        console.error(error);
+      }
+    };
+    fetchPostDetails();
+  }, [postId]);
+
+  // Handle content change
+  const handleContentChange = (e) => {
+    setContent(e.target.value);
+  };
+
+  // Handle new image upload
+  const handleImageUpload = async (e) => {
     if (e.target.files && e.target.files[0]) {
-      setImages([...images, URL.createObjectURL(e.target.files[0])]); // Add new image to images array
+      const file = e.target.files[0];
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await axios.post(
+          "http://localhost:8800/api/uploads/file",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+            withCredentials: true,
+          }
+        );
+
+        setImages((prev) => [...prev, res.data.url]); // Add new uploaded image URL
+      } catch (error) {
+        setErr("Failed to upload image. Please try again.");
+        console.error(error);
+      }
     }
   };
 
-  // Remove image from the images array
-  const removeImage = (index) => {
-    setImages(images.filter((_, i) => i !== index)); // Remove selected image
+  // Remove an image (both new and existing)
+  const removeImage = (index, isExisting) => {
+    if (isExisting) {
+      setExistingImages((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setImages((prev) => prev.filter((_, i) => i !== index));
+    }
   };
 
-  // Save changes and close the popup
-  const handleSave = () => {
-    if (content.trim() === "") {
-      alert("Post content cannot be empty!");
+  // Save changes
+  const handleSaveChanges = async () => {
+    if (!content.trim() && existingImages.length === 0 && images.length === 0) {
+      setErr("Post content or at least one image is required.");
       return;
     }
-    onSave({ content, image: images }); // Pass updated content and images
-    onClose(); // Close the popup
+
+    setLoading(true);
+    setErr(null);
+
+    try {
+      // Prepare the updated post payload
+      const updatedPost = {
+        description: content,
+        img: JSON.stringify([...existingImages, ...images]), // Merge new and existing images
+      };
+
+      // Update post via API
+      await axios.put(`http://localhost:8800/api/posts/${postId}`, updatedPost, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      });
+
+      navigate(`/event/${postId}`); // Redirect to the event page
+    } catch (error) {
+      setErr("Failed to save changes. Please try again.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => {
-    setContent(postContent); // Ensure the content is updated when prop changes
-    setImages(postImage ? [postImage] : []); // Ensure the image is updated when prop changes
-  }, [postContent, postImage]);
-
-  if (!isOpen) return null;
+  if (!content && existingImages.length === 0 && images.length === 0) {
+    return <p className="text-center text-gray-500">Loading post details...</p>;
+  }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      {/* Popup Container */}
-      <div className="bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full relative z-50">
-        {/* Title and Close Button */}
-        <div className="flex justify-between items-center py-2 mb-4">
-          <div className="flex items-center">
-            <button className="text-gray-600" onClick={onClose}>
-              <FaTimes className="text-2xl" />
-            </button>
-            <h2 className="text-2xl font-bold ml-4">Edit Post</h2>
-          </div>
-          {/* Save Changes Button */}
+    <div className="edit-post-page flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8 overflow-y-auto">
+      <div className="content-container bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl relative">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Edit Post</h2>
           <button
-            onClick={handleSave}
-            className={`post-button px-4 py-2 rounded-md text-white ${
-              content && images.length > 0
-                ? "bg-[#508C9B] hover:bg-[#134B70]"
-                : "bg-[#C0DBEA] cursor-not-allowed"
+            onClick={handleSaveChanges}
+            className={`px-4 py-2 rounded-md text-white ${
+              loading
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-[#508C9B] hover:bg-[#134B70]"
             }`}
-            disabled={!content && images.length === 0}
+            disabled={loading}
           >
-            Save Changes
+            {loading ? "Saving..." : "Save Changes"}
           </button>
         </div>
 
-        <hr className="my-2" />
+        {err && <p className="text-red-500 mb-4">{err}</p>}
 
-        {/* Description Textarea */}
-        <div className="description-section mb-4">
-          <textarea
-            className="description-input border border-gray-300 rounded-md w-full p-3 text-gray-600"
-            placeholder="What is happening?"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows="4"
-            style={{ overflow: "hidden", resize: "none" }}
-          />
-        </div>
-
-        {/* Image Upload Section */}
-        <div className="image-upload-section mb-4 grid grid-cols-3 gap-4">
-          {images.length > 0 &&
-            Array.from({ length: 3 }).map((_, index) => {
-              // Check if there is an image or if the index is for a placeholder
-              if (index < images.length) {
-                return (
-                  <div
-                    key={index}
-                    className="image-upload-container border border-gray-300 rounded-md w-full h-48 flex items-center justify-center overflow-hidden relative"
-                  >
-                    <img
-                      src={images[index]}
-                      alt="Uploaded"
-                      className="w-full h-full object-cover"
-                    />
-                    <button
-                      className="absolute top-1 right-1 text-red-500 text-xl"
-                      onClick={() => removeImage(index)} // Remove image
-                    >
-                      <FaTimes />
-                    </button>
-                  </div>
-                );
-              }
-              // If index is equal to the number of images, show the placeholder (+) if images < 3
-              if (images.length < 3 && index === images.length) {
-                return (
-                  <div
-                    key={index}
-                    className="image-upload-container border border-gray-300 rounded-md w-full h-48 flex items-center justify-center overflow-hidden relative"
-                  >
-                    <label
-                      htmlFor="fileInput"
-                      className="cursor-pointer text-gray-400 text-3xl flex items-center justify-center w-full h-full"
-                    >
-                      +
-                    </label>
-                  </div>
-                );
-              }
-              return null; // Don't display the placeholder if images are 3 or more
-            })}
-        </div>
-
-        {/* Add Image Button, Only Visible If Images < 3 */}
-        {images.length < 3 && (
-          <label
-            htmlFor="fileInput"
-            className="add-image-button bg-[#508C9B] text-white py-2 px-4 rounded-md hover:bg-[#134B70] flex items-center justify-center w-full h-12"
-          >
-            <FaPhotoVideo className="mr-2" />
-            Add Image/Video
-          </label>
-        )}
-
-        <input
-          id="fileInput"
-          type="file"
-          className="hidden"
-          onChange={handleImageChange} // Handle image upload
+        {/* Post Content */}
+        <textarea
+          className="w-full p-3 border border-gray-300 rounded-md mb-6"
+          rows="5"
+          placeholder="Edit your post..."
+          value={content}
+          onChange={handleContentChange}
         />
+
+        {/* Image Uploads */}
+        <div className="grid grid-cols-3 gap-4">
+          {/* Existing Images */}
+          {existingImages.map((img, index) => (
+            <div key={index} className="relative">
+              <img
+                src={img}
+                alt={`Existing ${index + 1}`}
+                className="w-full h-32 object-cover rounded-md"
+              />
+              <button
+                onClick={() => removeImage(index, true)}
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+              >
+                &times;
+              </button>
+            </div>
+          ))}
+
+          {/* New Images */}
+          {images.map((img, index) => (
+            <div key={index} className="relative">
+              <img
+                src={img}
+                alt={`New ${index + 1}`}
+                className="w-full h-32 object-cover rounded-md"
+              />
+              <button
+                onClick={() => removeImage(index, false)}
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+              >
+                &times;
+              </button>
+            </div>
+          ))}
+
+          {/* Add New Image */}
+          {existingImages.length + images.length < 3 && (
+            <label className="w-full h-32 border border-gray-300 flex items-center justify-center rounded-md text-gray-400 cursor-pointer">
+              <FaPhotoVideo className="text-3xl" />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageUpload}
+              />
+            </label>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default EditPostPopup;
+export default EditPost;

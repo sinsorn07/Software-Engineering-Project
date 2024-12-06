@@ -12,10 +12,11 @@ import LogoutPopup from "./components/logout/Logout"; // Logout popup component
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import CreatePost from "./pages/createPost/CreatePost";
+import EditPost from "./components/editPost/EditPost";
 import CreateEvent from "./pages/createEvent/CreateEvent";
 import EventDetail from "./pages/eventDetail/eventDetail";
 import EditEvent from "./pages/editEvent/EditEvent";
-import EditProfile from "./pages/editProfile/EditProfile";
+import EditProfile from "./pages/EditProfile/EditProfile";
 import MyEvent from "./pages/myEvent/MyEvent";
 import Chat from "./pages/chat/Chat";
 import Home from "./pages/home/Home";
@@ -82,6 +83,7 @@ function App() {
         { path: "/event/:eventId", element: <EventDetail /> },
         { path: "/event/:eventId/chat", element: <Chat /> },
         { path: "/event/:eventId/create-post", element: <CreatePost /> },
+        { path: "/posts/:postId/edit-post", element: <EditPost /> },
         { path: "/my-event", element: <MyEvent /> },
       ],
     },

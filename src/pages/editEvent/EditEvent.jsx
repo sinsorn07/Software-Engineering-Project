@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaPhotoVideo, FaEdit, FaCheck } from "react-icons/fa";
+import { FaPhotoVideo } from "react-icons/fa";
 import BackButton from "../../components/backbutton/BackButton";
 import axios from "axios";
 
 const EditEvent = () => {
     const { eventId } = useParams(); // Get the event ID from the URL
-    console.log("Event ID:", eventId);
-
-
     const navigate = useNavigate();
 
-    // States to manage event data
+    // States for event data
     const [inputs, setInputs] = useState({
         eventName: "",
         description: "",
@@ -22,24 +19,16 @@ const EditEvent = () => {
         start_time: "",
         end_time: "",
     });
-    const [image, setImage] = useState(null); // New image to upload
+    const [image, setImage] = useState(null); // For new image upload
     const [existingImage, setExistingImage] = useState(""); // Existing image URL
-    const [isEditing, setIsEditing] = useState({}); // Track editable fields
-    const [loading, setLoading] = useState(false); // Handle submission state
-    const [err, setErr] = useState(null); // Handle errors
+    const [loading, setLoading] = useState(false); // Submission state
+    const [err, setErr] = useState(null); // Error handling
 
-    const formatDate = (date) => {
-        const options = { year: "numeric", month: "long", day: "numeric" };
-        return new Date(date).toLocaleDateString(undefined, options);
-    };
-    const formatTime = (timeString) => {
-        if (!timeString) return ""; // Handle empty/null cases
-        const [hours, minutes] = timeString.split(":");
-        return `${hours}:${minutes}`; // Return "HH:mm"
-    };
+    // Format date and time utilities
+    const formatDate = (date) => new Date(date).toISOString().split("T")[0];
+    const formatTime = (timeString) => (timeString ? timeString.slice(0, 5) : "");
 
-
-    // Fetch event details on component load
+    // Fetch event details on mount
     useEffect(() => {
         const fetchEventDetails = async () => {
             try {
@@ -57,7 +46,6 @@ const EditEvent = () => {
                     start_time: formatTime(event.start_time),
                     end_time: formatTime(event.end_time),
                 });
-
                 setExistingImage(event.img); // Load existing image
             } catch (error) {
                 console.error("Failed to fetch event details:", error);
@@ -67,21 +55,40 @@ const EditEvent = () => {
         fetchEventDetails();
     }, [eventId]);
 
-    const handleChange = (e) => {
+    // Handle input changes
+    const handleInputChange = (e) => {
         const { name, value } = e.target;
-        console.log("Field changed:", name, value);
         setInputs((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleImageChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            setImage(e.target.files[0]);
+    // Handle image upload
+    const handleImageChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await axios.post(
+                "http://localhost:8800/api/uploads/file",
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    withCredentials: true,
+                }
+            );
+            setExistingImage(response.data.url); // Set the uploaded image URL
+            setImage(file); // Update the image state for preview
+       } catch (error) {
+            setErr("Failed to upload image. Please try again.");
+            console.error(error);
         }
     };
 
     const removeImage = () => {
-        setImage(null);
         setExistingImage("");
+        setImage(null);
     };
 
     const toggleEdit = (field) => {
@@ -91,51 +98,25 @@ const EditEvent = () => {
         }));
     };
 
-    const handleSubmit = async () => {
+   const handleSubmit = async () => {
         setLoading(true);
         setErr(null);
 
         try {
-            // Validate required fields before making the API call
+            // Validate required fields
             if (!inputs.eventName || !inputs.start_date || !inputs.end_date) {
                 setErr("Please fill out all required fields.");
                 setLoading(false);
                 return;
             }
 
-            // Optional image upload logic
-            let uploadedFileUrl = existingImage;
-            if (image) {
-                const formData = new FormData();
-                formData.append("file", image);
-
-                const uploadResponse = await axios.post(
-                    "http://localhost:8800/api/uploads/file",
-                    formData,
-                    {
-                        headers: { "Content-Type": "multipart/form-data" },
-                        withCredentials: true,
-                    }
-                );
-
-                uploadedFileUrl = uploadResponse.data.url;
-            }
-
-            // Map frontend variables to match database column names
+            // Prepare payload
             const editEvent = {
-                eventName: inputs.eventName,
-                description: inputs.description,
-                locationName: inputs.locationName,
-                link: inputs.link,
-                start_date: inputs.start_date,
-                end_date: inputs.end_date,
-                start_time: inputs.start_time || null,
-                end_time: inputs.end_time || null,
-                img: uploadedFileUrl,
+                ...inputs,
+                img: existingImage || null,
             };
 
-
-            // Make the PUT request to update the event and location
+            // Update the event
             await axios.put(
                 `http://localhost:8800/api/event/${eventId}`,
                 editEvent,
@@ -154,103 +135,147 @@ const EditEvent = () => {
         }
     };
 
-    if (!inputs.eventName) return <p className="text-center text-gray-500">Loading event details...</p>;
+    if (!inputs.eventName) {
+        return <p className="text-center text-gray-500">Loading event details...</p>;
+    }
 
     return (
         <div className="edit-event-page flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8 overflow-y-auto">
             <div className="content-container bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
                 <div className="header-section flex items-center justify-start w-full mb-8 relative">
                     <BackButton onClick={() => navigate(`/event/${eventId}`)} />
-                    <h2 className="text-3xl font-bold ml-3">Edit Event Details</h2>
+                    <h2 className="text-3xl font-bold ml-4">Edit Event</h2>
                 </div>
 
-                {/* Image Section */}
+                {/* Image Upload Section */}
                 <div className="image-upload-section flex flex-col items-center mb-8">
                     <div
                         className="image-frame w-full bg-gray-200 rounded-md flex items-center justify-center mb-4 relative"
                         style={{ aspectRatio: "16 / 9" }}
                     >
-                        {image ? (
-                            <img
-                                src={URL.createObjectURL(image)}
-                                alt="Uploaded"
-                                className="w-full h-full object-cover rounded-md"
-                            />
-                        ) : existingImage ? (
-                            <img
-                                src={existingImage}
-                                alt="Event"
-                                className="w-full h-full object-cover rounded-md"
-                            />
-                        ) : (
+                        {existingImage || image ? (
+                            <div className="relative w-full h-full">
+                                <img
+                                    src={image ? URL.createObjectURL(image) : existingImage}
+                                    alt="Uploaded"
+                                    className="w-full h-full object-cover rounded-md"
+                                />
+                                <button
+                                    onClick={removeImage}
+                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-700"
+                                    aria-label="Remove image"
+                                >
+                                    &times;
+                                </button>
+                            </div>
+                       ) : (
                             <label className="add-image-button flex flex-col items-center text-gray-500 hover:text-gray-700 cursor-pointer">
                                 <FaPhotoVideo className="text-3xl mb-2" />
-                                <span>Insert Image</span>
+                                <span>Upload Image</span>
                                 <input
                                     type="file"
                                     accept="image/*"
                                     onChange={handleImageChange}
                                     className="hidden"
                                 />
-                            </label>
-                        )}
-                        {(image || existingImage) && (
-                            <button
-                                onClick={removeImage}
-                                className="absolute top-1 right-1 font-bold text-red-500 text-6xl hover:text-red-700 h-12 w-12 rounded-full"
-                                aria-label="Remove image"
-                            >
-                                &times;
-                            </button>
+                           </label>
                         )}
                     </div>
                 </div>
 
                 {/* Form Fields */}
                 <div className="form-section space-y-6">
-                    {Object.entries(inputs).map(([field, value]) => (
-                        <div key={field} className="mb-4">
-                            <div className="flex items-center">
-                                <label className="block text-lg font-semibold mb-2 capitalize">
-                                    {field.replace("_", " ")}
-                                </label>
-                                <FaEdit
-                                    className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B]"
-                                    onClick={() => toggleEdit(field)}
-                                />
-                            </div>
-                            {isEditing[field] ? (
-                                <div className="flex items-center">
-                                    <input
-                                        type={field.includes("date") ? "date" : field.includes("time") ? "time" : "text"}
-                                        name={field}
-                                        value={value}
-                                        onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-md p-3"
-                                    />
-                                    <FaCheck
-                                        className="ml-2 cursor-pointer text-gray-500 hover:text-[#508C9B]"
-                                        onClick={() => toggleEdit(field)}
-                                    />
-                                </div>
-                            ) : (
-                                <p>{value}</p>
-                            )}
+                    <div>
+                        <label className="block text-lg font-semibold mb-2">Event Name</label>
+                        <input
+                            type="text"
+                            name="eventName"
+                            value={inputs.eventName}
+                            onChange={handleInputChange}
+                            className="w-full border border-gray-300 rounded-md p-3"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-lg font-semibold mb-2">Description</label>
+                        <textarea
+                            name="description"
+                            value={inputs.description}
+                            onChange={handleInputChange}
+                            className="w-full border border-gray-300 rounded-md p-3"
+                            rows="4"
+                        />
+                    </div>
+
+                    <div className="date-time-section space-y-6">
+                        <h3 className="text-lg font-semibold">Date & Time</h3>
+                        <div className="flex space-x-4">
+                            <input
+                                type="date"
+                                name="start_date"
+                                value={inputs.start_date}
+                                onChange={handleInputChange}
+                                className="border border-gray-300 rounded-md p-2"
+                            />
+                            <input
+                                type="date"
+                                name="end_date"
+                                value={inputs.end_date}
+                                onChange={handleInputChange}
+                                className="border border-gray-300 rounded-md p-2"
+                            />
                         </div>
-                    ))}
+                        <div className="flex space-x-4">
+                            <input
+                                type="time"
+                                name="start_time"
+                                value={inputs.start_time}
+                                onChange={handleInputChange}
+                                className="border border-gray-300 rounded-md p-2"
+                            />
+                            <input
+                                type="time"
+                                name="end_time"
+                                value={inputs.end_time}
+                                onChange={handleInputChange}
+                                className="border border-gray-300 rounded-md p-2"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-lg font-semibold mb-2">Location Name</label>
+                        <input
+                            type="text"
+                            name="locationName"
+                            value={inputs.locationName}
+                            onChange={handleInputChange}
+                            className="w-full border border-gray-300 rounded-md p-3 mb-4"
+                        />
+                        <label className="block text-lg font-semibold mb-2">Location Link</label>
+                        <input
+                            type="text"
+                            name="link"
+                            value={inputs.link}
+                            onChange={handleInputChange}
+                            className="w-full border border-gray-300 rounded-md p-3"
+                        />
+                    </div>
                 </div>
 
                 {/* Submit Button */}
-                <div className="footer-section flex justify-center mt-8">
+                <div className="mt-8 flex justify-center">
                     <button
                         onClick={handleSubmit}
-                        className={`w-full bg-[#508C9B] text-white py-3 rounded-md text-lg font-semibold hover:bg-[#134B70] ${loading ? "opacity-50 cursor-not-allowed" : ""
-                            }`}
+                        className={`px-8 py-3 rounded-md font-semibold ${
+                            loading ? "bg-gray-300 cursor-not-allowed" : "bg-[#508C9B] text-white hover:bg-[#134B70]"
+                        }`}
                         disabled={loading}
                     >
                         {loading ? "Saving..." : "Save Changes"}
                     </button>
                 </div>
+
                 {err && <p className="text-red-500 text-center mt-4">{err}</p>}
             </div>
         </div>

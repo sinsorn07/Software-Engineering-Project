@@ -19,6 +19,7 @@ router.post("/", addEvent);
 router.put("/:eventId", editEvent);
 
 // Join an event
+
 router.post("/joinEvent", joinEvent);
 
 // Leave an event

@@ -192,13 +192,7 @@ export default function MyEvent() {
           )}
         </div>
 
-        {/* Floating Button for Adding Events */}
-        <Link
-          to="/create-event"
-          className="flex items-center justify-center text-white fixed bottom-8 right-8 rounded-full w-[48px] h-[48px] bg-[#508C9B] hover:bg-[#134B70] transition-all duration-100 shadow-xl"
-        >
-          <FaPen className="text-md" />
-        </Link>
+
       </div>
     </div>
   );
