@@ -159,6 +159,7 @@ export const getPostById = (req, res) => {
 // Delete a post
 export const deletePost = [verifyToken, (req, res) => {
     const query = `DELETE FROM posts WHERE id = ? AND userId = ?`;
+    console.log("Delete request received for post ID:", req.params.id);
 
     db.query(query, [req.params.id, req.userInfo.id], (err, data) => {
         if (err) return res.status(500).json(err); // Internal server error

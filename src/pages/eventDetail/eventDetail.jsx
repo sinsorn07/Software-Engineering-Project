@@ -72,10 +72,11 @@ const EventDetail = () => {
         const response = await makeRequest.get(`/posts?eventId=${eventId}`, {
           withCredentials: true,
         });
+        console.log("Fetched posts:", response.data);
 
         // Parse img field into an array and map the response
         const posts = response.data.map(post => ({
-          postId: post.postId,
+          postId: post.postId || post.id,
           userId: post.userId,
           userName: post.userName,
           img: post.img ? JSON.parse(post.img) : [], // Parse JSON string into array
@@ -375,39 +376,41 @@ const ParticipantsTab = ({ event, participant, handleNavigateToProfile }) => (
   </div>
 );
 
-
 // Posts Tab
-const PostsTab = ({ eventId, eventPosts, currentUser, handleEditPost, handleDeletePost }) => (
-  <div className="posts-tab w-full max-w-3xl bg-white rounded-lg shadow-md p-6">
-
-    <h3 className="text-lg font-semibold mb-4">Posts</h3>
-    {eventPosts.length > 0 ? (
-      eventPosts.map((post) => (
-        <Post
-          key={post.postId}
-          postId={post.postId}
-          userId={post.userId}
-          userName={post.userName}
-          img={post.img}
-          profilePic={post.profilePic}
-          description={post.description}
-          created_datetime={post.created_datetime}
-          eventName={post.eventName}
-          currentUser={currentUser}
-          // likes={post.likes || 0}
-          // comments={post.comments || []}
-          // onProfileClick={(username) => console.log(`Navigate to profile of ${username}`)}
-          onProfileClick={(userId) => handleNavigateToProfile(userId)}
-          onEdit={() => handleEditPost(post.id)}
-          onDelete={() => handleDeletePost(post.id)}
-        />
-      ))
-    ) : (
-      <p>No posts for this event.</p>
-    )}
-  </div>
-);
+const PostsTab = ({ eventId, eventPosts, currentUser, handleEditPost, handleDeletePost }) => {
+  console.log("eventPosts data:", eventPosts); 
+  console.log("currentUser in PostsTab:", currentUser); // Debugging currentUser
 
 
+  return (
+    <div className="posts-tab w-full max-w-3xl bg-white rounded-lg shadow-md p-6">
+      <h3 className="text-lg font-semibold mb-4">Posts</h3>
+      {eventPosts.length > 0 ? (
+        eventPosts.map((post) => {
+          console.log("Post ID in PostsTab:", post.postId); 
+          return (
+            <Post
+              key={post.postId}
+              postId={post.postId}
+              userId={post.userId}
+              userName={post.userName}
+              img={post.img}
+              profilePic={post.profilePic}
+              description={post.description}
+              created_datetime={post.created_datetime}
+              eventName={post.eventName}
+              currentUser={currentUser}
+              onProfileClick={(userId) => console.log(`Navigate to profile of userId: ${userId}`)}
+              onEdit={() => handleEditPost(post.postId)}
+              onDelete={() => handleDeletePost(post.postId)}
+            />
+          );
+        })
+      ) : (
+        <p>No posts for this event.</p> 
+      )}
+    </div>
+  );
+};
 
 export default EventDetail;
