@@ -9,6 +9,23 @@ export default function Event({ event, isMyEventPage }) {
   //TODO Get Join Status for each event
   const [participants, setParticipants] = useState([]);
 
+  const handleJoinEvent = async (eventId) => {
+    try {
+      const response = await axios.post(
+        `/api/event/join`, 
+        { eventId }, 
+        { withCredentials: true }
+      );
+      if (response.status === 200) {
+        alert("Successfully joined the event!");
+      }
+    } catch (error) {
+      console.error("Failed to join the event:", error);
+      alert("An error occurred while trying to join the event.");
+    }
+  };
+  
+
   const handleJoinClick = (e) => {
     e.preventDefault(); // Prevent link navigation
     //TODO API INSERT TABLe --> API PASS "setIsJoined(true);"
@@ -71,8 +88,8 @@ export default function Event({ event, isMyEventPage }) {
         <div className="flex items-center justify-center pb-2 mb-4">
 
           <button
-            onClick={() => {
-              handleJoinClick();
+            onClick={(e) => {
+              handleJoinClick(e); ;
               handleJoinEvent(event.id);
             }}
             className={`flex w-[90%] items-center justify-center ${

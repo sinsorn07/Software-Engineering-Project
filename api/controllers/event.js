@@ -303,10 +303,32 @@ export const deleteEvent = [verifyToken, (req, res) => {
   });
 }];
 
+// // Join an event
+// export const joinEvent = [verifyToken, (req, res) => {
+//   const qCheck = "SELECT * FROM participants WHERE userId = ? AND eventId = ?";
+//   const values = [req.userInfo.id, req.body.eventId];
+
 // Join an event
 export const joinEvent = [verifyToken, (req, res) => {
   const qCheck = "SELECT * FROM participants WHERE userId = ? AND eventId = ?";
   const values = [req.userInfo.id, req.body.eventId];
+
+  // Check if the user has already joined the event
+  db.query(qCheck, values, (err, data) => {
+    if (err) return res.status(500).json({ message: "Database error occurred", error: err });
+    if (data.length > 0) {
+      return res.status(400).json("You have already joined this event.");
+    }
+
+    // If not joined, insert into participants table
+    const qInsert = "INSERT INTO participants (userId, eventId) VALUES (?, ?)";
+    db.query(qInsert, values, (err, result) => {
+      if (err) return res.status(500).json({ message: "Failed to join the event", error: err });
+      return res.status(200).json("Successfully joined the event.");
+    });
+  });
+}];
+
 
   // Check for duplicate entry
   db.query(qCheck, values, (err, data) => {
@@ -319,7 +341,7 @@ export const joinEvent = [verifyToken, (req, res) => {
       return res.status(200).json("Successfully joined the event.");
     });
   });
-}];
+;
 
 // Leave an event
 export const leaveEvent = [verifyToken, (req, res) => {

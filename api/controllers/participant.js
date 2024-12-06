@@ -46,4 +46,3 @@ export const getJoinedParticipant = (req, res) => {
     return res.status(200).json({ participant: results });
   });
 };
-  

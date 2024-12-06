@@ -256,6 +256,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 const Post = ({
   postId,
@@ -280,6 +282,13 @@ const Post = ({
     setShowOptions(!showOptions);
   };
 
+  const navigate = useNavigate();
+
+  const handleEditPost = () => {
+    navigate(`/edit-post/${postId}`);
+  };
+  
+  
   // Delete the post
   const handleDeletePost = async () => {
     try {
@@ -354,6 +363,14 @@ const Post = ({
               ref={optionsRef}
               className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg border border-gray-200 z-50"
             >
+                
+            <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
+                onClick={handleEditPost}
+            >
+            Edit Post
+            </button>
+
+
               <button
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
                 onClick={handleDeletePost}
