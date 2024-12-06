@@ -94,7 +94,8 @@ const EditPost = () => {
         withCredentials: true,
       });
 
-      navigate(`/event/${postId}`); // Redirect to the event page
+      // navigate(`/event/${postId}`); 
+      navigate(-1);
     } catch (error) {
       setErr("Failed to save changes. Please try again.");
       console.error(error);
@@ -144,7 +145,7 @@ const EditPost = () => {
               <img
                 src={img}
                 alt={`Existing ${index + 1}`}
-                className="w-full h-32 object-cover rounded-md"
+                className="w-full aspect-square object-cover rounded-md"
               />
               <button
                 onClick={() => removeImage(index, true)}
@@ -161,7 +162,7 @@ const EditPost = () => {
               <img
                 src={img}
                 alt={`New ${index + 1}`}
-                className="w-full h-32 object-cover rounded-md"
+                className="w-full aspect-square object-cover rounded-md"
               />
               <button
                 onClick={() => removeImage(index, false)}
@@ -174,7 +175,7 @@ const EditPost = () => {
 
           {/* Add New Image */}
           {existingImages.length + images.length < 3 && (
-            <label className="w-full h-32 border border-gray-300 flex items-center justify-center rounded-md text-gray-400 cursor-pointer">
+            <label className="w-full aspect-square border border-gray-300 flex items-center justify-center rounded-md text-gray-400 cursor-pointer">
               <FaPhotoVideo className="text-3xl" />
               <input
                 type="file"
